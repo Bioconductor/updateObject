@@ -129,6 +129,14 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
     nothing_to_update <- TRUE
     for (objname in names(envir)) {
         x <- get(objname, envir=envir, inherits=FALSE)
+        ## Some datasets could have been saved with
+        ##   save(..., eval.promises=FALSE)
+        ## so the first time we'll try to access 'x', the promise will
+        ## evaluate and this could raise warnings or print messages.
+        ## This is actually the case for the 'studiesTable' dataset in
+        ## the cBioPortalData package.
+        ## To prevent surprises further down we force evaluation now.
+        suppressMessages(suppressWarnings(force(x)))
         .load_classdef_pkg(class(x))
         y <- try(.update_object(x, filter=filter), silent=TRUE)
         if (.is_try_error(y)) {
