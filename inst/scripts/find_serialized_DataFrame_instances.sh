@@ -9,7 +9,7 @@ set -e  # exit immediately if a simple command returns a non-zero status
 
 # Settings for 3.15 software packages on nebbiolo1:
 MEAT0_DIR="/home/biocbuild/bbs-3.15-bioc/MEAT0"
-Rscript="/home/biocbuild/bbs-3.15-bioc/R/bin/Rscript-4.2"
+Rscript="/home/biocbuild/bbs-3.15-bioc/R/bin/Rscript"
 
 SKIPPED_PKGS="c('BaalChIP', 'CytoTree', 'gwascat', 'isobar', 'SNPhood')"
 FILTER="\\\\bDataFrame\\\\b"
