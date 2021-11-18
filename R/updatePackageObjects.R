@@ -70,7 +70,7 @@ collect_rda_files <- function(dirpath=".")
         )
         match_filter <- any(grepl(filter, output))
         if (match_filter) {
-            message("match found ... ", appendLF=FALSE)
+            message("MATCH FOUND! ... ", appendLF=FALSE)
         } else {
             message("no match found ... ", appendLF=FALSE)
             ans <- x

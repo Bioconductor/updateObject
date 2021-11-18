@@ -184,6 +184,8 @@ all_pkgs <- dir()  # get list of packages
 ## skipped packages:
 SKIPPED_PKGS <- c("BaalChIP", "CytoTree", "isobar", "SNPhood")
 
+## --- Without a filter ---
+
 ## updateAllPackageObjects() will stop with an error if a package is
 ## required but not installed. The user is responsible for installing
 ## all the required packages (this can be hard to know in advance).
@@ -212,6 +214,19 @@ table(codes)
 ## > sum(codes > 0) / length(codes)
 ## [1] 0.2094823
 ## 21% packages with old S4 instances!
+
+## --- With a filter ---
+
+## We want to filter on the presence of the **word** "DataFrame" in
+## the output of 'updateObject( , check=FALSE, verbose=TRUE)'. We can't
+## just set 'filter' to '"DataFrame" for that as this would also produce
+## matches in the presence of strings like "AnnotatedDataFrame":
+filter <- "\\bDataFrame\\b"
+
+codes <- updateAllPackageObjects(all_pkgs, skipped_pkgs=SKIPPED_PKGS,
+                                 filter=filter,
+                                 dry.run=TRUE)
+
 }
 }
 \keyword{utilities}
