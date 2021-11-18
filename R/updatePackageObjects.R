@@ -126,7 +126,7 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
         message("can't load the file --> ", .LOAD_FILE_FAILED)
         return(.LOAD_FILE_FAILED)
     }
-    updated_classes <- character(0)
+    nothing_to_update <- TRUE
     for (objname in names(envir)) {
         x <- get(objname, envir=envir, inherits=FALSE)
         .load_classdef_pkg(class(x))
@@ -136,16 +136,16 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
                     .UPDATE_OBJECT_FAILED)
             return(.UPDATE_OBJECT_FAILED)
         }
-        if (digest(x) != digest(y))
-            updated_classes <- c(updated_classes, class(x)[[1L]])
+        if (digest(x) != digest(y)) {
+            message(class(x)[[1L]], " updated ... ", appendLF=FALSE)
+            nothing_to_update <- FALSE
+        }
         assign(objname, y, envir=envir, inherits=FALSE)
     }
-    if (length(updated_classes) == 0L) {
+    if (nothing_to_update) {
         message("nothing to update --> ", .NOTHING_TO_UPDATE)
         return(.NOTHING_TO_UPDATE)
     }
-    message(paste0(updated_classes, "(s)", collapse=", "),
-            " updated ... ", appendLF=FALSE)
     if (dry.run) {
         message("won't save file (dry run)", appendLF=FALSE)
     } else {
