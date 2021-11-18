@@ -141,7 +141,7 @@ all_pkgs <- dir()  # get list of packages
 ## for this. However, by using the 'skipped_pkgs' argument, all the
 ## packages will be represented in the returned vector, including the
 ## skipped packages:
-SKIPPED_PKGS <- c("BaalChIP", "cellmigRation", "CytoTree", "isobar", "SNPhood")
+SKIPPED_PKGS <- c("BaalChIP", "CytoTree", "isobar", "SNPhood")
 
 ## updateAllPackageObjects() will stop with an error if a package is
 ## required but not installed. The user is responsible for installing
@@ -155,13 +155,21 @@ sessionInfo()  # many packages
 table(codes)
 
 ## The above code was successfully run in the MEAT0 folder on nebbiolo1
-## (BioC 3.15, 2067 packages) on Nov 17, 2021:
-## - took about 11 min
-## - sessionInfo() reported between 650 and 700 packages were loaded!
+## (BioC 3.15, 2067 packages) on Nov 18, 2021:
+## - took about 14 min
+## - loaded 1190 packages (as reported by sessionInfo())
 ## - required about 9GB of RAM
-## > table(candidate_pkgs)
-## FALSE  TRUE 
-##  1679   388   --> 18% packages contained old S4 instances!
+##
+## > table(codes)
+## codes
+## codes
+##   -3   -2   -1    0    1    2    3    4    5    6    7    8    9   10
+##    5   15   65 1549  240   90   46   28    7    5    4    3    3    1
+##   13   18   20   23  125
+##    2    1    1    1    1
+## > sum(codes > 0) / length(codes)
+## [1] 0.2094823
+## 21% packages with old S4 instances!
 }
 }
 \keyword{utilities}
