@@ -23,18 +23,23 @@ collect_rda_files <- function(dirpath=".")
   ## instances EH170 to EH175 in ExperimentHub. Not sure how that's allowed
   ## but let's just deal with it.
     ".GlobalEnv",
-  ## The QCStats class (e.g. "arrayMvout/inst/simpleaffy/afxsubQC.rda")
-  ## was defined in simpleaffy which got removed in BioC 3.13.
-    "simpleaffy",
-  ## The MutationFeatureData class (e.g.
-  ## decompTumor2Sig/inst/extdata/Nik-Zainal_PMID_22608084-pmsignature-G.Rdata)
-  ## is defined in pmsignature which is not part of CRAN or Bioconductor
-  ## (GitHub-only package).
-    "pmsignature",
+  ## SimResults class (e.g.
+  ## "iCOBRA/inst/extdata/cobradata_example_simres.Rdata") is defined in the
+  ## benchmarkR package which is not part of CRAN or Bioconductor (GitHub-only
+  ## package).
+    "benchmarkR",
   ## The galgo.Obj class (e.g. "GSgalgoR/inst/extdata/results/final_1.rda")
   ## used to be defined in galgoR but this package no longer exists (has
   ## been renamed GSgalgoR).
     "galgoR",
+  ## The MutationFeatureData class (e.g.
+  ## decompTumor2Sig/inst/extdata/Nik-Zainal_PMID_22608084-pmsignature-G.Rdata)
+  ## is defined in the pmsignature package which is not part of CRAN or
+  ## Bioconductor (GitHub-only package).
+    "pmsignature",
+  ## The QCStats class (e.g. "arrayMvout/inst/simpleaffy/afxsubQC.rda")
+  ## was defined in simpleaffy which got removed in BioC 3.13.
+    "simpleaffy",
   ## The YAQCStats class (e.g. "qcmetrics/inst/extdata/yqc.rda")
   ## was defined in yaqcaffy which got removed in BioC 3.14.
     "yaqcaffy"
@@ -47,7 +52,7 @@ collect_rda_files <- function(dirpath=".")
     classdef_pkg <- attr(x_class, "package")
     if (is.null(classdef_pkg) || classdef_pkg %in% .KNOWN_INVALID_CLASSDEF_PKGS)
         return()
-    loadNamespace(classdef_pkg)
+    suppressPackageStartupMessages(loadNamespace(classdef_pkg))
 }
 
 .update_object <- function(x)
@@ -155,7 +160,7 @@ updateAllPackageObjects <- function(all_pkgs, skipped_pkgs=NULL, dry.run=FALSE)
     vapply(all_pkgs,
         function(pkg) {
             if (!is.null(skipped_pkgs) && (pkg %in% skipped_pkgs)) {
-                message("Skip package --> ", .SKIPPED_PACKAGE)
+                message("Skip package ", pkg, " --> ", .SKIPPED_PACKAGE)
                 return(.SKIPPED_PACKAGE)
             }
             updatePackageObjects(pkg, dry.run=dry.run)
