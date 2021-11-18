@@ -1,5 +1,5 @@
 Package: updateObject
-Title: Detect/fix old serialized S4 instances
+Title: Find/fix old serialized S4 instances
 Description: A set of tools built around updateObject() to work with old
 	serialized S4 instances.
 biocViews: Infrastructure, DataRepresentation
