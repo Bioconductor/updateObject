@@ -1,4 +1,5 @@
 import(methods)
+importFrom(utils, capture.output)
 import(digest)
 
 import(BiocGenerics)

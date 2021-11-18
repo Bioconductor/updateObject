@@ -57,8 +57,27 @@ collect_rda_files <- function(dirpath=".")
     )))
 }
 
-.update_object <- function(x)
-    suppressMessages(suppressWarnings(updateObject(x, check=FALSE)))
+.update_object <- function(x, filter=NULL)
+{
+    if (is.null(filter)) {
+        suppressMessages(
+            ans <- suppressWarnings(updateObject(x, check=FALSE))
+        )
+    } else {
+        output <- capture.output(
+            ans <- suppressWarnings(updateObject(x, check=FALSE, verbose=TRUE)),
+            type="message"
+        )
+        match_filter <- any(grepl(filter, output))
+        if (match_filter) {
+            message("match found ... ", appendLF=FALSE)
+        } else {
+            message("no match found ... ", appendLF=FALSE)
+            ans <- x
+        }
+    }
+    ans
+}
 
 .SKIPPED_PACKAGE      <- -3L
 .LOAD_FILE_FAILED     <- -2L
@@ -66,7 +85,7 @@ collect_rda_files <- function(dirpath=".")
 .NOTHING_TO_UPDATE    <-  0L
 .FILE_UPDATED         <-  1L
 
-update_rds_file <- function(filepath, dry.run=FALSE)
+update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
 {
     message("Processing '", filepath, "' ... ", appendLF=FALSE)
     x <- try(readRDS(filepath), silent=TRUE)
@@ -75,7 +94,7 @@ update_rds_file <- function(filepath, dry.run=FALSE)
         return(.LOAD_FILE_FAILED)
     }
     .load_classdef_pkg(class(x))
-    y <- try(.update_object(x), silent=TRUE)
+    y <- try(.update_object(x, filter=filter), silent=TRUE)
     if (.is_try_error(y)) {
         message("updateObject() returned an error --> ",
                 .UPDATE_OBJECT_FAILED)
@@ -97,7 +116,7 @@ update_rds_file <- function(filepath, dry.run=FALSE)
     .FILE_UPDATED
 }
 
-update_rda_file <- function(filepath, dry.run=FALSE)
+update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
 {
     message("Processing '", filepath, "' ... ", appendLF=FALSE)
     envir <- new.env(parent=emptyenv())
@@ -111,7 +130,7 @@ update_rda_file <- function(filepath, dry.run=FALSE)
     for (objname in names(envir)) {
         x <- get(objname, envir=envir, inherits=FALSE)
         .load_classdef_pkg(class(x))
-        y <- try(.update_object(x), silent=TRUE)
+        y <- try(.update_object(x, filter=filter), silent=TRUE)
         if (.is_try_error(y)) {
             message("updateObject() returned an error --> ",
                     .UPDATE_OBJECT_FAILED)
@@ -139,17 +158,17 @@ update_rda_file <- function(filepath, dry.run=FALSE)
 }
 
 ### Return nb of updated files or negative error code.
-updatePackageObjects <- function(pkg_dirpath=".", dry.run=FALSE)
+updatePackageObjects <- function(pkg_dirpath=".", filter=NULL, dry.run=FALSE)
 {
     codes <- integer(0)
     rds_paths <- collect_rds_files(pkg_dirpath)
     for (filepath in rds_paths) {
-        code <- update_rds_file(filepath, dry.run=dry.run)
+        code <- update_rds_file(filepath, filter=filter, dry.run=dry.run)
         codes <- c(codes, code)
     }
     rda_paths <- collect_rda_files(pkg_dirpath)
     for (filepath in rda_paths) {
-        code <- update_rda_file(filepath, dry.run=dry.run)
+        code <- update_rda_file(filepath, filter=filter, dry.run=dry.run)
         codes <- c(codes, code)
     }
     if (any(codes < 0L))
@@ -158,7 +177,8 @@ updatePackageObjects <- function(pkg_dirpath=".", dry.run=FALSE)
 }
 
 ### Return a named integer vector **parallel** to 'all_pkgs'.
-updateAllPackageObjects <- function(all_pkgs, skipped_pkgs=NULL, dry.run=FALSE)
+updateAllPackageObjects <- function(all_pkgs, skipped_pkgs=NULL,
+                                    filter=NULL, dry.run=FALSE)
 {
     vapply(all_pkgs,
         function(pkg) {
@@ -166,7 +186,7 @@ updateAllPackageObjects <- function(all_pkgs, skipped_pkgs=NULL, dry.run=FALSE)
                 message("Skip package ", pkg, " --> ", .SKIPPED_PACKAGE)
                 return(.SKIPPED_PACKAGE)
             }
-            updatePackageObjects(pkg, dry.run=dry.run)
+            updatePackageObjects(pkg, filter=NULL, dry.run=dry.run)
         },
         integer(1)
     )

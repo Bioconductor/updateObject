@@ -19,12 +19,15 @@
 }
 
 \usage{
-updatePackageObjects(pkg_dirpath=".", dry.run=FALSE)
-updateAllPackageObjects(all_pkgs, skipped_pkgs=NULL, dry.run=FALSE)
+updatePackageObjects(pkg_dirpath=".",
+                     filter=NULL, dry.run=FALSE)
+
+updateAllPackageObjects(all_pkgs, skipped_pkgs=NULL,
+                     filter=NULL, dry.run=FALSE)
 
 ## Low-level utilities:
-update_rds_file(filepath, dry.run=FALSE)
-update_rda_file(filepath, dry.run=FALSE)
+update_rds_file(filepath, filter=NULL, dry.run=FALSE)
+update_rda_file(filepath, filter=NULL, dry.run=FALSE)
 collect_rds_files(dirpath=".")
 collect_rda_files(dirpath=".")
 }
@@ -33,6 +36,17 @@ collect_rda_files(dirpath=".")
   \item{pkg_dirpath}{
     The path (as a single string) to the top-level directory of a package
     source tree.
+  }
+  \item{filter}{
+    \code{NULL} (the default) or a single string containing a regular
+    expression.
+
+    When \code{filter} is set, only objects for which there is a match
+    in the output of \code{updateObject(object, check=FALSE, verbose=TRUE)}
+    actually get replaced with the object returned by the \code{updateObject}
+    call. See Details section below for more on this.
+
+    Note that the pattern matching is \emph{case sensitive}.
   }
   \item{dry.run}{
     \code{TRUE} or \code{FALSE}. By default, updated objects are written
@@ -60,6 +74,27 @@ collect_rda_files(dirpath=".")
   \code{update_rds_file()} and \code{update_rds_file()} use
   \code{\link[BiocGenerics]{updateObject}()} internally to update
   individual R objects.
+
+  If no filter is specified (the default), each object is updated with
+  \code{object <- updateObject(object, check=FALSE)}. If that turns out
+  to be a no-op, then code 0 ("nothing to update") is returned.
+  Otherwise 1 is returned.
+
+  If a filter is specified (via the \code{filter} argument) then
+  \code{updateObject(object, check=FALSE, verbose=TRUE)} is called on each
+  object and the output of the call is captured with \code{capture.output()}.
+  Only if the output contains a match for \code{filter} is the object
+  replaced with the object returned by the call. If this replacement turns
+  out to be a no-op, or if the output contained no match for \code{filter},
+  then code 0 ("nothing to update") is returned. Otherwise 1 is returned.
+
+  The pattern matching is \emph{case sensitive}.
+
+  Note that determining whether a call to \code{updateObject()} is a no-op
+  or not is done by calling \code{digest::\link[digest]{digest}()} on the
+  original object and object returned by \code{updateObject()}, and by
+  comparing the 2 hash values. This is a LOT MORE reliable than using
+  \code{identical()} which is notoriously unreliable!
 }
 
 \value{
@@ -81,8 +116,14 @@ collect_rda_files(dirpath=".")
 
 \seealso{
   \itemize{
-    \item \code{\link[BiocGenerics]{updateObject}} in the
-          \pkg{BiocGenerics} package.
+    \item The \code{\link[BiocGenerics]{updateObject}} generic function
+          in the \pkg{BiocGenerics} package.
+
+    \item The \code{\link[utils]{capture.output}} function in the \pkg{utils}
+          package.
+
+    \item The \code{\link[digest]{digest}} function in the \pkg{digest}
+          package.
   }
 }
 
