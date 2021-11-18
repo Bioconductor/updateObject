@@ -141,7 +141,7 @@ all_pkgs <- dir()  # get list of packages
 ## for this. However, by using the 'skipped_pkgs' argument, all the
 ## packages will be represented in the returned vector, including the
 ## skipped packages:
-SKIPPED_PKGS <- c("cellmigRation", "CytoTree", "isobar", "SNPhood")
+SKIPPED_PKGS <- c("BaalChIP", "cellmigRation", "CytoTree", "isobar", "SNPhood")
 
 ## updateAllPackageObjects() will stop with an error if a package is
 ## required but not installed. The user is responsible for installing

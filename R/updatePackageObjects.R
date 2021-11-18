@@ -50,8 +50,10 @@ collect_rda_files <- function(dirpath=".")
     loadNamespace(classdef_pkg)
 }
 
-.update_object <- function(x) suppressWarnings(updateObject(x, check=FALSE))
+.update_object <- function(x)
+    suppressMessages(suppressWarnings(updateObject(x, check=FALSE)))
 
+.SKIPPED_PACKAGE      <- -3L
 .LOAD_FILE_FAILED     <- -2L
 .UPDATE_OBJECT_FAILED <- -1L
 .NOTHING_TO_UPDATE    <-  0L
@@ -153,8 +155,8 @@ updateAllPackageObjects <- function(all_pkgs, skipped_pkgs=NULL, dry.run=FALSE)
     vapply(all_pkgs,
         function(pkg) {
             if (!is.null(skipped_pkgs) && (pkg %in% skipped_pkgs)) {
-                message("skipping package ", pkg)
-                return(FALSE)
+                message("Skip package --> ", .SKIPPED_PACKAGE)
+                return(.SKIPPED_PACKAGE)
             }
             updatePackageObjects(pkg, dry.run=dry.run)
         },
