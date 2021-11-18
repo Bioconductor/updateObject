@@ -72,7 +72,7 @@ collect_rda_files <- function(dirpath=".")
         if (match_filter) {
             message("MATCH FOUND! ... ", appendLF=FALSE)
         } else {
-            message("no match found ... ", appendLF=FALSE)
+            message("no match ... ", appendLF=FALSE)
             ans <- x
         }
     }

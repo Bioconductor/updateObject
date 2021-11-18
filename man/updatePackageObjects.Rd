@@ -182,7 +182,7 @@ all_pkgs <- dir()  # get list of packages
 ## for this. However, by using the 'skipped_pkgs' argument, all the
 ## packages will be represented in the returned vector, including the
 ## skipped packages:
-SKIPPED_PKGS <- c("BaalChIP", "CytoTree", "isobar", "SNPhood")
+SKIPPED_PKGS <- c("BaalChIP", "CytoTree", "gwascat", "isobar", "SNPhood")
 
 ## --- Without a filter ---
 
