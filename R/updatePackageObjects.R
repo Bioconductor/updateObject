@@ -52,7 +52,9 @@ collect_rda_files <- function(dirpath=".")
     classdef_pkg <- attr(x_class, "package")
     if (is.null(classdef_pkg) || classdef_pkg %in% .KNOWN_INVALID_CLASSDEF_PKGS)
         return()
-    suppressPackageStartupMessages(loadNamespace(classdef_pkg))
+    suppressMessages(suppressPackageStartupMessages(
+        loadNamespace(classdef_pkg)
+    ))
 }
 
 .update_object <- function(x)
