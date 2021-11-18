@@ -1,0 +1,15 @@
+import(methods)
+import(digest)
+
+import(BiocGenerics)
+import(AnnotationHub)
+
+export(
+    collect_rds_files,
+    collect_rda_files,
+    update_rds_file,
+    update_rda_file,
+    updatePackageObjects,
+    updateAllPackageObjects
+)
+
