@@ -63,14 +63,17 @@ collect_rda_files(dirpath=".")
 }
 
 \value{
-  \code{updatePackageObjects()} returns \code{TRUE} or \code{FALSE},
-  indicating whether changes were made to the package or not.
+  \code{updatePackageObjects()} returns the number of updated files or
+  a negative error code (-2 if loading an RDS or RDA file failed, -1 if
+  \code{updateObject()} returned an error).
 
-  \code{updateAllPackageObjects()} returns a named logical vector
+  \code{updateAllPackageObjects()} returns a named integer vector
   \emph{parallel} to \code{all_pkgs}.
 
-  \code{update_rds_file()} and \code{update_rda_file()} return \code{TRUE}
-  or \code{FALSE}, indicating whether the RDS or RDA file was modified or not.
+  \code{update_rds_file()} and \code{update_rda_file()} return -2 if
+  loading the RDS or RDA file failed, -1 if \code{updateObject()} returned
+  an error, 0 if there was nothing to update in the file, and 1 if the
+  file got updated.
 
   \code{collect_rds_files()} and \code{collect_rda_files()} return a
   character vector of (relative) file paths.
@@ -85,17 +88,19 @@ collect_rda_files(dirpath=".")
 
 \examples{
 \dontrun{
-## ------------------------------------------------------
-## A simple updatePackageObjects() example
-## ------------------------------------------------------
+## ---------------------------------------------------------------------
+## A SIMPLE updatePackageObjects() EXAMPLE
+## ---------------------------------------------------------------------
 
-## We don't need to perform two passes (dry run + "real" run), one pass
-## enough. We show the 2-pass procedure only for illustrative purpose.
+## Note that we don't need to perform two passes ("dry run" + "real run"),
+## one pass is enough. Here we show the 2-pass procedure only for
+## illustrative purpose.
+
 pkg_url <- "https://git.bioconductor.org/packages/CellBench"
 system2("git", c("clone", pkg_url))
 setwd("CellBench")
-modified <- updatePackageObjects(dry.run=TRUE)
-if (modified) {
+code <- updatePackageObjects(dry.run=TRUE)
+if (code > 0) {
     updatePackageObjects()  # do it for good!
     ## Use an editor to bump the version in the DESCRIPTION file.
     commit_msg <- "'Pass serialized S4 instances thru updateObject()'"
@@ -103,9 +108,13 @@ if (modified) {
     setwd("..")
 }
 
-## ------------------------------------------------------
-## Find candidate packages in current directory (dry run)
-## ------------------------------------------------------
+## ---------------------------------------------------------------------
+## FIND CANDIDATE PACKAGES IN CURRENT DIRECTORY
+## ---------------------------------------------------------------------
+
+## In this example we perform a "dry run" with updateAllPackageObjects()
+## to find all the packages in a directory that contain old serialized
+## objects.
 
 ## Load some packages upfront that are known to define updateObject()
 ## methods:
@@ -134,20 +143,25 @@ all_pkgs <- dir()  # get list of packages
 ## skipped packages:
 SKIPPED_PKGS <- c("cellmigRation", "CytoTree", "isobar", "SNPhood")
 
-## updateAllPackageObjects() will stop if a package is required but
-## not installed. The user is responsible for installing all the
-## required packages (this can be hard to know in advance).
-candidate_pkgs <- updateAllPackageObjects(all_pkgs,
-                                          skipped_pkgs=SKIPPED_PKGS,
-                                          dry.run=TRUE)
+## updateAllPackageObjects() will stop with an error if a package is
+## required but not installed. The user is responsible for installing
+## all the required packages (this can be hard to know in advance).
+## Having pre-loaded a bunch of packages above only increases our chance
+## of a successful run.
+codes <- updateAllPackageObjects(all_pkgs, skipped_pkgs=SKIPPED_PKGS,
+                                 dry.run=TRUE)
 
 sessionInfo()  # many packages
-table(candidate_pkgs)
+table(codes)
 
-## Running the above code in the MEAT0 folder on nebbiolo1 (BioC 3.15):
-## - takes about 11 min
-## - loads between 650 and 700 packages!
-## - requires about 9GB of RAM
+## The above code was successfully run in the MEAT0 folder on nebbiolo1
+## (BioC 3.15, 2067 packages) on Nov 17, 2021:
+## - took about 11 min
+## - sessionInfo() reported between 650 and 700 packages were loaded!
+## - required about 9GB of RAM
+## > table(candidate_pkgs)
+## FALSE  TRUE 
+##  1679   388   --> 18% packages contained old S4 instances!
 }
 }
 \keyword{utilities}
