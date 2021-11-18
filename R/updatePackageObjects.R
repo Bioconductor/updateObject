@@ -11,79 +11,46 @@ collect_rds_files <- function(dirpath=".")
 collect_rda_files <- function(dirpath=".")
     collect_files(dirpath, c("rda", "RData"))
 
-.OLD_update_object <- function(x)
+### If 'x' is an S4 object, doing 'inherits(x, "try-error")' will trigger
+### the loading of 'attr(class(x), "package")' and we don't want that.
+.is_try_error <- function(x) { !isS4(x) && inherits(x, "try-error") }
+
+### Known invalid packages found in 'attr(class(x), "package")' as of
+### Nov 17, 2021.
+.KNOWN_INVALID_CLASSDEF_PKGS <- c(
+  ## For some serialized S4 instances hub 'attr(class(x), "package")' is
+  ## set to ".GlobalEnv"! This is the case for example for CellMapperList
+  ## instances EH170 to EH175 in ExperimentHub. Not sure how that's allowed
+  ## but let's just deal with it.
+    ".GlobalEnv",
+  ## The QCStats class (e.g. "arrayMvout/inst/simpleaffy/afxsubQC.rda")
+  ## was defined in simpleaffy which got removed in BioC 3.13.
+    "simpleaffy",
+  ## The MutationFeatureData class (e.g.
+  ## decompTumor2Sig/inst/extdata/Nik-Zainal_PMID_22608084-pmsignature-G.Rdata)
+  ## is defined in pmsignature which is not part of CRAN or Bioconductor
+  ## (GitHub-only package).
+    "pmsignature",
+  ## The galgo.Obj class (e.g. "GSgalgoR/inst/extdata/results/final_1.rda")
+  ## used to be defined in galgoR but this package no longer exists (has
+  ## been renamed GSgalgoR).
+    "galgoR",
+  ## The YAQCStats class (e.g. "qcmetrics/inst/extdata/yqc.rda")
+  ## was defined in yaqcaffy which got removed in BioC 3.14.
+    "yaqcaffy"
+)
+
+### Make sure that the package where the class of 'x' is defined is loaded
+### before calling 'updateObject()' on 'x'.
+.load_classdef_pkg <- function(x_class)
 {
-    ## The QCStats class (e.g. "arrayMvout/inst/simpleaffy/afxsubQC.rda")
-    ## was defined in simpleaffy which got removed in BioC 3.13.
-    ## The YAQCStats class (e.g. "qcmetrics/inst/extdata/yqc.rda")
-    ## was defined in yaqcaffy which got removed in BioC 3.14.
-    ## The MutationFeatureData class (e.g. decompTumor2Sig/inst/extdata/Nik-Zainal_PMID_22608084-pmsignature-G.Rdata)
-    ## is defined in pmsignature which is not part of CRAN or Bioconductor
-    ## (GitHub-only package).
-    ## The galgo.Obj class (e.g. "GSgalgoR/inst/extdata/results/final_1.rda")
-    ## used to be defined in galgoR but this package no longer exists (has
-    ## been renamed GSgalgoR).
-    classdef_pkg <- attr(class(x), "package")
-    if (!is.null(classdef_pkg) &&
-        classdef_pkg %in% c("simpleaffy", "pmsignature", "galgoR", "yaqcaffy"))
-        return(x)
-    ## We're not touching eSet derivatives.
-    if (is(x, "eSet"))
-        return(x)
-    ## QDNAseqCopyNumbers, Autotuner, BaalChIP, MethyLumiQC, MethyLumiSet,
-    ## ccGeneList, CellMig, CeTF, trackedCells, CEMiTool, CogapsResult, and
-    ## AnnotationHubMetadata objects don't support updateObject().
-    ## updateObject() is broken on stanfit objects.
-    ## updateObject() is currently broken on some MultiAssayExperiment
-    ## objects (e.g. on "AffiXcan/inst/extdata/testing.tba.toydata.rds"),
-    ## some BASiCS_Chain objects (e.g. "BASiCS/data/ChainRNA.rda"), and
-    ## some xcmsSet objects (e.g. "CAMERA/data/mm14.rda").
-    if (is(x, "QDNAseqCopyNumbers") ||
-        is(x, "Autotuner") ||
-        is(x, "BaalChIP") ||
-        is(x, "MethyLumiQC") ||
-        is(x, "MethyLumiSet") ||
-        is(x, "ccGeneList") ||
-        is(x, "CellMig") ||
-        is(x, "CeTF") ||
-        is(x, "trackedCells") ||
-        is(x, "CEMiTool") ||
-        is(x, "CogapsResult") ||
-        is(x, "AnnotationHubMetadata") ||
-        is(x, "stanfit") ||
-        is(x, "MultiAssayExperiment") ||
-        is(x, "BASiCS_Chain") ||
-        is(x, "xcmsSet"))
-        return(x)
-    #ans <- try(suppressWarnings(suppressPackageStartupMessages(
-    #             AnnotationHub:::.updateObject(x)
-    #           )), silent=TRUE)
-    #if (inherits(ans, "try-error"))
-    #    ans <- x
-    #ans
-    AnnotationHub:::.updateObject(x)
+    classdef_pkg <- attr(x_class, "package")
+    if (is.null(classdef_pkg) || classdef_pkg %in% .KNOWN_INVALID_CLASSDEF_PKGS)
+        return()
+    loadNamespace(classdef_pkg)
 }
 
-.update_object <- function(x)
-{
-    ## The QCStats class (e.g. "arrayMvout/inst/simpleaffy/afxsubQC.rda")
-    ## was defined in simpleaffy which got removed in BioC 3.13.
-    ## The YAQCStats class (e.g. "qcmetrics/inst/extdata/yqc.rda")
-    ## was defined in yaqcaffy which got removed in BioC 3.14.
-    ## The MutationFeatureData class (e.g. decompTumor2Sig/inst/extdata/Nik-Zainal_PMID_22608084-pmsignature-G.Rdata)
-    ## is defined in pmsignature which is not part of CRAN or Bioconductor
-    ## (GitHub-only package).
-    ## The galgo.Obj class (e.g. "GSgalgoR/inst/extdata/results/final_1.rda")
-    ## used to be defined in galgoR but this package no longer exists (has
-    ## been renamed GSgalgoR).
-    classdef_pkg <- attr(class(x), "package")
-    if (!is.null(classdef_pkg) &&
-        classdef_pkg %in% c("simpleaffy", "pmsignature", "galgoR", "yaqcaffy"))
-    {
-        return(x)
-    }
-    AnnotationHub:::.updateObject(x)
-}
+.update_object <- function(x) suppressWarnings(updateObject(x, check=FALSE))
 
 .LOAD_FILE_FAILED     <- -2L
 .UPDATE_OBJECT_FAILED <- -1L
@@ -94,12 +61,13 @@ update_rds_file <- function(filepath, dry.run=FALSE)
 {
     message("Processing '", filepath, "' ... ", appendLF=FALSE)
     x <- try(readRDS(filepath), silent=TRUE)
-    if (inherits(x, "try-error")) {
+    if (.is_try_error(x)) {
         message("can't read RDS file --> ", .LOAD_FILE_FAILED)
         return(.LOAD_FILE_FAILED)
     }
+    .load_classdef_pkg(class(x))
     y <- try(.update_object(x), silent=TRUE)
-    if (inherits(y, "try-error")) {
+    if (.is_try_error(y)) {
         message("updateObject() returned an error --> ",
                 .UPDATE_OBJECT_FAILED)
         return(.UPDATE_OBJECT_FAILED)
@@ -125,15 +93,16 @@ update_rda_file <- function(filepath, dry.run=FALSE)
     message("Processing '", filepath, "' ... ", appendLF=FALSE)
     envir <- new.env(parent=emptyenv())
     res <- try(suppressWarnings(load(filepath, envir=envir)), silent=TRUE)
-    if (inherits(res, "try-error")) {
+    if (.is_try_error(res)) {
         message("can't load the file --> ", .LOAD_FILE_FAILED)
         return(.LOAD_FILE_FAILED)
     }
     updated_classes <- character(0)
     for (objname in names(envir)) {
         x <- get(objname, envir=envir, inherits=FALSE)
+        .load_classdef_pkg(class(x))
         y <- try(.update_object(x), silent=TRUE)
-        if (inherits(y, "try-error")) {
+        if (.is_try_error(y)) {
             message("updateObject() returned an error --> ",
                     .UPDATE_OBJECT_FAILED)
             return(.UPDATE_OBJECT_FAILED)

@@ -5,13 +5,13 @@ Description: A set of tools built around updateObject() to work with old
 biocViews: Infrastructure, DataRepresentation
 URL: https://bioconductor.org/packages/updateObject
 BugReports: https://github.com/Bioconductor/updateObject/issues
-Version: 0.0.2
+Version: 0.0.3
 License: Artistic-2.0
 Encoding: UTF-8
 Author: Hervé Pagès <hpages.on.github@gmail.com>
 Maintainer: Hervé Pagès <hpages.on.github@gmail.com>
 Depends: R (>= 4.1.0), methods, BiocGenerics
-Imports: digest, AnnotationHub
+Imports: digest
 Suggests: SummarizedExperiment, GenomicAlignments, DelayedArray, HDF5Array,
 	SingleCellExperiment, MultiAssayExperiment, bsseq, InteractionSet,
 	GSEABase, Gviz

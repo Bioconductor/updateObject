@@ -2,7 +2,6 @@ import(methods)
 import(digest)
 
 import(BiocGenerics)
-import(AnnotationHub)
 
 export(
     collect_rds_files,

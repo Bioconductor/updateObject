@@ -147,7 +147,7 @@ SKIPPED_PKGS <- c("cellmigRation", "CytoTree", "isobar", "SNPhood")
 ## required but not installed. The user is responsible for installing
 ## all the required packages (this can be hard to know in advance).
 ## Having pre-loaded a bunch of packages above only increases our chance
-## of a successful run.
+## of a smooth run.
 codes <- updateAllPackageObjects(all_pkgs, skipped_pkgs=SKIPPED_PKGS,
                                  dry.run=TRUE)
 
