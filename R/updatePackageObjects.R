@@ -186,7 +186,7 @@ updateAllPackageObjects <- function(all_pkgs, skipped_pkgs=NULL,
                 message("Skip package ", pkg, " --> ", .SKIPPED_PACKAGE)
                 return(.SKIPPED_PACKAGE)
             }
-            updatePackageObjects(pkg, filter=NULL, dry.run=dry.run)
+            updatePackageObjects(pkg, filter=filter, dry.run=dry.run)
         },
         integer(1)
     )
