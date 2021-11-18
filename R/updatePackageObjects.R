@@ -52,9 +52,9 @@ collect_rda_files <- function(dirpath=".")
     classdef_pkg <- attr(x_class, "package")
     if (is.null(classdef_pkg) || classdef_pkg %in% .KNOWN_INVALID_CLASSDEF_PKGS)
         return()
-    suppressMessages(suppressPackageStartupMessages(
+    suppressMessages(suppressWarnings(suppressPackageStartupMessages(
         loadNamespace(classdef_pkg)
-    ))
+    )))
 }
 
 .update_object <- function(x)
@@ -101,7 +101,8 @@ update_rda_file <- function(filepath, dry.run=FALSE)
 {
     message("Processing '", filepath, "' ... ", appendLF=FALSE)
     envir <- new.env(parent=emptyenv())
-    res <- try(suppressWarnings(load(filepath, envir=envir)), silent=TRUE)
+    res <- try(suppressMessages(suppressWarnings(load(filepath, envir=envir))),
+               silent=TRUE)
     if (.is_try_error(res)) {
         message("can't load the file --> ", .LOAD_FILE_FAILED)
         return(.LOAD_FILE_FAILED)
