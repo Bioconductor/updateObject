@@ -99,7 +99,7 @@ update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
     .load_classdef_pkg(class(x))
     y <- try(.update_object(x, filter=filter), silent=TRUE)
     if (.is_try_error(y)) {
-        message("updateObject() returned an error ==> ",
+        message("returned an error ==> ",
                 .UPDATE_OBJECT_FAILED)
         return(.UPDATE_OBJECT_FAILED)
     }
@@ -146,7 +146,7 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
         .load_classdef_pkg(class(x))
         y <- try(.update_object(x, filter=filter), silent=TRUE)
         if (.is_try_error(y)) {
-            message("updateObject() returned an error ==> ",
+            message("returned an error ==> ",
                     .UPDATE_OBJECT_FAILED)
             return(.UPDATE_OBJECT_FAILED)
         }
