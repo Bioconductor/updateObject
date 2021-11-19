@@ -59,7 +59,7 @@ collect_rda_files <- function(dirpath=".")
 
 .update_object <- function(x, filter=NULL)
 {
-    message("updateObject(", class(x)[[1L]], ", check=FALSE) ... ",
+    message("updateObject(", class(x)[[1L]], ", check=FALSE).. ",
             appendLF=FALSE)
     if (is.null(filter)) {
         suppressMessages(
@@ -72,9 +72,9 @@ collect_rda_files <- function(dirpath=".")
         )
         match_filter <- any(grepl(filter, output))
         if (match_filter) {
-            message("MATCH FOUND! ... ", appendLF=FALSE)
+            message("MATCH FOUND! ", appendLF=FALSE)
         } else {
-            message("no match ... ", appendLF=FALSE)
+            message("no match ", appendLF=FALSE)
             ans <- x
         }
     }
@@ -89,47 +89,47 @@ collect_rda_files <- function(dirpath=".")
 
 update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
 {
-    message("Processing ", filepath, ": readRDS() ... ", appendLF=FALSE)
+    message("Processing ", filepath, ": readRDS().. ", appendLF=FALSE)
     x <- try(readRDS(filepath), silent=TRUE)
     if (.is_try_error(x)) {
-        message("failed! --> ", .LOAD_FILE_FAILED)
+        message("failed! ==> ", .LOAD_FILE_FAILED)
         return(.LOAD_FILE_FAILED)
     }
-    message("ok ... ", appendLF=FALSE)
+    message("ok; ", appendLF=FALSE)
     .load_classdef_pkg(class(x))
     y <- try(.update_object(x, filter=filter), silent=TRUE)
     if (.is_try_error(y)) {
-        message("updateObject() returned an error --> ",
+        message("updateObject() returned an error ==> ",
                 .UPDATE_OBJECT_FAILED)
         return(.UPDATE_OBJECT_FAILED)
     }
     if (digest(x) == digest(y)) {
-        message("nothing to update --> ", .NOTHING_TO_UPDATE)
+        message("no-op ==> ", .NOTHING_TO_UPDATE)
         return(.NOTHING_TO_UPDATE)
     }
-    message(class(x)[[1L]], " updated ... ", appendLF=FALSE)
+    message("object updated; ", appendLF=FALSE)
     if (dry.run) {
-        message("won't save file (dry run)", appendLF=FALSE)
+        message("won't save file (dry run) ", appendLF=FALSE)
     } else {
-        message("saving file ... ", appendLF=FALSE)
+        message("saving file.. ", appendLF=FALSE)
         saveRDS(y, file=filepath, compress=TRUE)
-        message("OK", appendLF=FALSE)
+        message("OK ", appendLF=FALSE)
     }
-    message(" --> ", .FILE_UPDATED)
+    message("==> ", .FILE_UPDATED)
     .FILE_UPDATED
 }
 
 update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
 {
-    message("Processing ", filepath, ": load() ... ", appendLF=FALSE)
+    message("Processing ", filepath, ": load().. ", appendLF=FALSE)
     envir <- new.env(parent=emptyenv())
     res <- try(suppressMessages(suppressWarnings(load(filepath, envir=envir))),
                silent=TRUE)
     if (.is_try_error(res)) {
-        message("failed! --> ", .LOAD_FILE_FAILED)
+        message("failed! ==> ", .LOAD_FILE_FAILED)
         return(.LOAD_FILE_FAILED)
     }
-    message("ok ... ", appendLF=FALSE)
+    message("ok; ", appendLF=FALSE)
     nothing_to_update <- TRUE
     for (objname in names(envir)) {
         x <- get(objname, envir=envir, inherits=FALSE)
@@ -144,28 +144,30 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
         .load_classdef_pkg(class(x))
         y <- try(.update_object(x, filter=filter), silent=TRUE)
         if (.is_try_error(y)) {
-            message("updateObject() returned an error --> ",
+            message("updateObject() returned an error ==> ",
                     .UPDATE_OBJECT_FAILED)
             return(.UPDATE_OBJECT_FAILED)
         }
-        if (digest(x) != digest(y)) {
-            message(class(x)[[1L]], " updated ... ", appendLF=FALSE)
+        if (digest(x) == digest(y)) {
+            message("no-op, ", appendLF=FALSE)
+        } else {
+            message("object updated; ", appendLF=FALSE)
             nothing_to_update <- FALSE
         }
         assign(objname, y, envir=envir, inherits=FALSE)
     }
     if (nothing_to_update) {
-        message("nothing to update --> ", .NOTHING_TO_UPDATE)
+        message("nothing to update ==> ", .NOTHING_TO_UPDATE)
         return(.NOTHING_TO_UPDATE)
     }
     if (dry.run) {
-        message("won't save file (dry run)", appendLF=FALSE)
+        message("won't save file (dry run) ", appendLF=FALSE)
     } else {
-        message("saving file ... ", appendLF=FALSE)
+        message("saving file.. ", appendLF=FALSE)
         save(list=names(envir), file=filepath, envir=envir, compress="xz")
-        message("OK", appendLF=FALSE)
+        message("OK ", appendLF=FALSE)
     }
-    message(" --> ", .FILE_UPDATED)
+    message("==> ", .FILE_UPDATED)
     .FILE_UPDATED
 }
 
@@ -195,7 +197,7 @@ updateAllPackageObjects <- function(all_pkgs, skipped_pkgs=NULL,
     vapply(all_pkgs,
         function(pkg) {
             if (!is.null(skipped_pkgs) && (pkg %in% skipped_pkgs)) {
-                message("Skip package ", pkg, " --> ", .SKIPPED_PACKAGE)
+                message("Skip package ", pkg, " ==> ", .SKIPPED_PACKAGE)
                 return(.SKIPPED_PACKAGE)
             }
             updatePackageObjects(pkg, filter=filter, dry.run=dry.run)
