@@ -72,9 +72,9 @@ collect_rda_files <- function(dirpath=".")
         )
         match_filter <- any(grepl(filter, output))
         if (match_filter) {
-            message("MATCH FOUND! ", appendLF=FALSE)
+            message("MATCH, ", appendLF=FALSE)
         } else {
-            message("no match ", appendLF=FALSE)
+            message("no match, ", appendLF=FALSE)
             ans <- x
         }
     }
@@ -123,15 +123,17 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
 {
     message("Processing ", filepath, ": load().. ", appendLF=FALSE)
     envir <- new.env(parent=emptyenv())
-    res <- try(suppressMessages(suppressWarnings(load(filepath, envir=envir))),
-               silent=TRUE)
-    if (.is_try_error(res)) {
+    objnames <- try(
+        suppressMessages(suppressWarnings(load(filepath, envir=envir))),
+        silent=TRUE
+    )
+    if (.is_try_error(objnames)) {
         message("failed! ==> ", .LOAD_FILE_FAILED)
         return(.LOAD_FILE_FAILED)
     }
-    message("ok; ", appendLF=FALSE)
+    message("ok [", length(objnames)," object(s)]; ", appendLF=FALSE)
     nothing_to_update <- TRUE
-    for (objname in names(envir)) {
+    for (objname in objnames) {
         x <- get(objname, envir=envir, inherits=FALSE)
         ## Some datasets could have been saved with
         ##   save(..., eval.promises=FALSE)
@@ -149,7 +151,7 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
             return(.UPDATE_OBJECT_FAILED)
         }
         if (digest(x) == digest(y)) {
-            message("no-op, ", appendLF=FALSE)
+            message("no-op; ", appendLF=FALSE)
         } else {
             message("object updated; ", appendLF=FALSE)
             nothing_to_update <- FALSE
