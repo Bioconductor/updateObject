@@ -87,12 +87,13 @@ collect_rda_files <- function(dirpath=".")
 
 update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
 {
-    message("Processing '", filepath, "' ... ", appendLF=FALSE)
+    message("Processing ", filepath, ": readRDS() ... ", appendLF=FALSE)
     x <- try(readRDS(filepath), silent=TRUE)
     if (.is_try_error(x)) {
-        message("can't read RDS file --> ", .LOAD_FILE_FAILED)
+        message("failed! --> ", .LOAD_FILE_FAILED)
         return(.LOAD_FILE_FAILED)
     }
+    message("ok ... ", appendLF=FALSE)
     .load_classdef_pkg(class(x))
     y <- try(.update_object(x, filter=filter), silent=TRUE)
     if (.is_try_error(y)) {
@@ -118,14 +119,15 @@ update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
 
 update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
 {
-    message("Processing '", filepath, "' ... ", appendLF=FALSE)
+    message("Processing ", filepath, ": load() ... ", appendLF=FALSE)
     envir <- new.env(parent=emptyenv())
     res <- try(suppressMessages(suppressWarnings(load(filepath, envir=envir))),
                silent=TRUE)
     if (.is_try_error(res)) {
-        message("can't load the file --> ", .LOAD_FILE_FAILED)
+        message("failed! --> ", .LOAD_FILE_FAILED)
         return(.LOAD_FILE_FAILED)
     }
+    message("ok ... ", appendLF=FALSE)
     nothing_to_update <- TRUE
     for (objname in names(envir)) {
         x <- get(objname, envir=envir, inherits=FALSE)

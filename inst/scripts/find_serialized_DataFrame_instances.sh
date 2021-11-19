@@ -11,7 +11,7 @@ set -e  # exit immediately if a simple command returns a non-zero status
 MEAT0_DIR="/home/biocbuild/bbs-3.15-bioc/MEAT0"
 Rscript="/home/biocbuild/bbs-3.15-bioc/R/bin/Rscript"
 
-SKIPPED_PKGS="c('BaalChIP', 'CytoTree', 'gwascat', 'isobar', 'SNPhood')"
+SKIPPED_PKGS="c('BaalChIP', 'BiGGR', 'ChIPpeakAnno', 'CytoTree', 'GeneAnswers', 'gwascat', 'isobar', 'mirIntegrator', 'oposSOM', 'SNPhood')"
 FILTER="\\\\bDataFrame\\\\b"
 
 R_EXPR="library(updateObject)"
