@@ -59,6 +59,8 @@ collect_rda_files <- function(dirpath=".")
 
 .update_object <- function(x, filter=NULL)
 {
+    message("updateObject(", class(x)[[1L]], ", check=FALSE) ... ",
+            appendLF=FALSE)
     if (is.null(filter)) {
         suppressMessages(
             ans <- suppressWarnings(updateObject(x, check=FALSE))
