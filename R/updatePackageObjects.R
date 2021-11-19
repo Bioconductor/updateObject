@@ -89,7 +89,7 @@ collect_rda_files <- function(dirpath=".")
 
 update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
 {
-    message("Processing ", filepath, ": readRDS().. ", appendLF=FALSE)
+    message("File ", filepath, ": readRDS().. ", appendLF=FALSE)
     x <- try(readRDS(filepath), silent=TRUE)
     if (.is_try_error(x)) {
         message("failed! ==> ", .LOAD_FILE_FAILED)
@@ -121,7 +121,7 @@ update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
 
 update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
 {
-    message("Processing ", filepath, ": load().. ", appendLF=FALSE)
+    message("File ", filepath, ": load().. ", appendLF=FALSE)
     envir <- new.env(parent=emptyenv())
     objnames <- try(
         suppressMessages(suppressWarnings(load(filepath, envir=envir))),
