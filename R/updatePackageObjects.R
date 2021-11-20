@@ -1,5 +1,11 @@
 collect_files <- function(dirpath, fileexts)
 {
+    if (!(is.character(dirpath) &&
+          length(dirpath) == 1L &&
+          dir.exists(dirpath)))
+    {
+        stop("directory '", dirpath, "' not found")
+    }
     pattern <- paste0("\\.(", paste(fileexts, collapse="|"), ")$")
     dir(dirpath, pattern=pattern, ignore.case=TRUE,
         recursive=TRUE, full.names=TRUE)
