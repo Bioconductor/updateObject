@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Usage:
-#   path/to/update_package_objects_and_commit.sh [--push] [branch] [repo_path]
+#   path/to/update_package_objects_and_commit.sh [--push] branch [repo_path]
 #
 
 #-------------------------- User-controlled settings --------------------------
@@ -24,7 +24,7 @@ print_usage()
 {
 	cat <<-EOD
 	Usage:
-	    $0 [--push] [branch] [repo_path]
+	    $0 [--push] branch [repo_path]
 	EOD
 	exit 1
 }
@@ -37,8 +37,12 @@ else
 	repo_path="$2"
 fi
 
-if [ "$branch" == "" ] || [ "$repo_path" == "" ]; then
+if [ "$branch" == "" ]; then
 	print_usage
+fi
+
+if [ "$repo_path" == "" ]; then
+	repo_path="."
 fi
 
 set -e  # exit if next command returns an error
@@ -47,6 +51,7 @@ set +e
 
 echo ""
 
+echo "Running updatePackageObjects(\"$repo_path\", filter=\"$filter\")..."
 R_EXPR="suppressPackageStartupMessages(library(updateObject))"
 R_EXPR="$R_EXPR;filter <- '$filter'"
 R_EXPR="$R_EXPR;code <- updatePackageObjects('$repo_path', filter=filter)"
@@ -58,12 +63,12 @@ exit_status="$?"
 echo ""
 
 if [ "$exit_status" == "1" ]; then
-	echo "Rscript returned an error! (see above)"
+	echo "ERROR: Rscript returned an unexpected error! (see above)"
 	exit 1
 fi
 
 if [ "$exit_status" == "2" ]; then
-	echo "updatePackageObjects() returned an error"
+	echo "ERROR: updatePackageObjects() returned an error! (see above)"
 	exit 2
 fi
 
