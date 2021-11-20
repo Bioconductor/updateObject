@@ -41,7 +41,9 @@ if [ "$branch" == "" ] || [ "$repo_path" == "" ]; then
 	print_usage
 fi
 
+set -e  # exit if next command returns an error
 /usr/bin/python3 "$python_script1" --branch "$branch" "$repo_path"
+set +e
 
 echo ""
 
