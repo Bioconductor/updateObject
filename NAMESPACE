@@ -10,6 +10,7 @@ export(
     update_rds_file,
     update_rda_file,
     updatePackageObjects,
-    updateAllPackageObjects
+    updateAllPackageObjects,
+    updateBiocPackageRepoObjects
 )
 
