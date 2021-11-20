@@ -48,7 +48,7 @@ echo ""
 R_EXPR="suppressPackageStartupMessages(library(updateObject))"
 R_EXPR="$R_EXPR;filter <- '$filter'"
 R_EXPR="$R_EXPR;code <- updatePackageObjects('$repo_path', filter=filter)"
-R_EXPR="$R_EXPR;exit_status <- if (code > 0) 0L else 2L"
+R_EXPR="$R_EXPR;exit_status <- if (code > 0) 0L else if (code < 0) 2L else 3L"
 R_EXPR="$R_EXPR;quit(save='no', status=exit_status)"
 $Rscript --vanilla -e "$R_EXPR"
 exit_status="$?"
@@ -61,8 +61,13 @@ if [ "$exit_status" == "1" ]; then
 fi
 
 if [ "$exit_status" == "2" ]; then
-	echo "NOTHING TO UPDATE."
+	echo "updatePackageObjects() returned an error"
 	exit 2
+fi
+
+if [ "$exit_status" == "3" ]; then
+	echo "NOTHING TO UPDATE."
+	exit 3
 fi
 
 if [ "$1" == "--push" ]; then
