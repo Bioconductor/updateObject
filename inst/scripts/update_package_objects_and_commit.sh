@@ -51,7 +51,7 @@ set +e
 
 echo ""
 
-echo "Running updatePackageObjects(\"$repo_path\", filter=\"$filter\")..."
+echo "Running 'updatePackageObjects(\"$repo_path\", filter=\"$filter\")'..."
 R_EXPR="suppressPackageStartupMessages(library(updateObject))"
 R_EXPR="$R_EXPR;filter <- '$filter'"
 R_EXPR="$R_EXPR;code <- updatePackageObjects('$repo_path', filter=filter)"
