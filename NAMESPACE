@@ -11,6 +11,7 @@ export(
     update_rda_file,
     updatePackageObjects,
     updateAllPackageObjects,
-    updateBiocPackageRepoObjects
+    updateBiocPackageRepoObjects,
+    updateAllBiocPackageRepoObjects
 )
 

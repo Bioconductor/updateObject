@@ -94,7 +94,7 @@ updateBiocPackageRepoObjects <- function(repo_path=".", branch=NULL,
 
     if (code == 0) {
         message("NOTHING TO UPDATE.")
-        return(FALSE)
+        return(invisible(code))
     }
 
     ## 3. Bump version, set current Date, commit, and push.
@@ -113,6 +113,31 @@ updateBiocPackageRepoObjects <- function(repo_path=".", branch=NULL,
         msg <- c(msg, " --> PUSH")
     msg <- c(msg, " SUCCESSFUL.")
     message(msg)
-    TRUE
+    invisible(code)
+}
+
+### Return a named integer vector **parallel** to 'all_repo_paths'.
+updateAllBiocPackageRepoObjects <- function(all_repo_paths=".",
+                                            skipped_repos=NULL, ...)
+{
+    FUN <- function(i) {
+        repo_path <- all_repo_paths[[i]]
+        message("")
+        message("=======================================",
+                "=======================================")
+        message("PROCESSING '", repo_path, "' ",
+                "(", i, "/", length(all_repo_paths), ")")
+        message("---------------------------------------",
+                "---------------------------------------")
+        message("")
+        if (!is.null(skipped_repos) && (repo_path %in% skipped_repos)) {
+            message("Skip repo ", repo_path, " ==> ", .SKIPPED_PACKAGE)
+            return(.SKIPPED_PACKAGE)
+        }
+        code <- updateBiocPackageRepoObjects(repo_path, ...)
+        message("")
+        code
+    }
+    invisible(vapply(seq_along(all_repo_paths), FUN, integer(1)))
 }
 
