@@ -180,15 +180,15 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
 }
 
 ### Return nb of updated files or negative error code.
-updatePackageObjects <- function(pkg_dirpath=".", filter=NULL, dry.run=FALSE)
+updatePackageObjects <- function(pkgpath=".", filter=NULL, dry.run=FALSE)
 {
     codes <- integer(0)
-    rds_paths <- collect_rds_files(pkg_dirpath)
+    rds_paths <- collect_rds_files(pkgpath)
     for (filepath in rds_paths) {
         code <- update_rds_file(filepath, filter=filter, dry.run=dry.run)
         codes <- c(codes, code)
     }
-    rda_paths <- collect_rda_files(pkg_dirpath)
+    rda_paths <- collect_rda_files(pkgpath)
     for (filepath in rda_paths) {
         code <- update_rda_file(filepath, filter=filter, dry.run=dry.run)
         codes <- c(codes, code)
@@ -198,17 +198,17 @@ updatePackageObjects <- function(pkg_dirpath=".", filter=NULL, dry.run=FALSE)
     sum(codes)
 }
 
-### Return a named integer vector **parallel** to 'all_pkgs'.
-updateAllPackageObjects <- function(all_pkgs, skipped_pkgs=NULL,
+### Return a named integer vector **parallel** to 'all_pkgpaths'.
+updateAllPackageObjects <- function(all_pkgpaths, skipped_pkgs=NULL,
                                     filter=NULL, dry.run=FALSE)
 {
-    vapply(all_pkgs,
-        function(pkg) {
-            if (!is.null(skipped_pkgs) && (pkg %in% skipped_pkgs)) {
-                message("Skip package ", pkg, " ==> ", .SKIPPED_PACKAGE)
+    vapply(all_pkgpaths,
+        function(pkgpath) {
+            if (!is.null(skipped_pkgs) && (pkgpath %in% skipped_pkgs)) {
+                message("Skip package ", pkgpath, " ==> ", .SKIPPED_PACKAGE)
                 return(.SKIPPED_PACKAGE)
             }
-            updatePackageObjects(pkg, filter=filter, dry.run=dry.run)
+            updatePackageObjects(pkgpath, filter=filter, dry.run=dry.run)
         },
         integer(1)
     )

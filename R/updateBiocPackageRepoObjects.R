@@ -63,10 +63,10 @@
 
 ### Requires Python, git (either in PATH or specified thru env var
 ### BBS_GIT_CMD), and BBS.
-updateBiocPackageRepoObjects <- function(repo_path=".", branch=NULL,
+updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
                                          filter=NULL,
                                          commit_msg=NULL, push=FALSE,
-                                         python=NULL, BBS_HOME=NULL)
+                                         BBS_HOME=NULL, python=NULL)
 {
     python <- find_python(python)
     ## Only as an early test.
@@ -76,18 +76,18 @@ updateBiocPackageRepoObjects <- function(repo_path=".", branch=NULL,
         commit_msg <- "Pass serialized S4 instances thru updateObject()"
 
     ## 1. Clone or pull package repo.
-    args <- repo_path
+    args <- repopath
     if (!is.null(branch))
         args <- c("--branch", branch, args)
     .run_BBS_script(python, "clone_or_pull_repo.py", args, BBS_HOME)
 
     ## 2. Update package objects.
-    call <- c("updatePackageObjects(\"", repo_path, "\"")
+    call <- c("updatePackageObjects(\"", repopath, "\"")
     if (!is.null(filter))
         call <- c(call, ", filter=\"", filter, "\"")
     call <- c(call, ")")
     message("RUNNING '", call, "'...")
-    code <- updatePackageObjects(repo_path, filter=filter)
+    code <- updatePackageObjects(repopath, filter=filter)
     message()
     if (code < 0)
         stop("updatePackageObjects() encountered an error")
@@ -100,7 +100,7 @@ updateBiocPackageRepoObjects <- function(repo_path=".", branch=NULL,
     ## 3. Bump version, set current Date, commit, and push.
     Sys.setenv(commit_msg=commit_msg)
     Sys.setenv(new_date=as.character(Sys.Date()))
-    args <- repo_path
+    args <- repopath
     if (!is.null(branch))
         args <- c("--branch", branch, args)
     if (push)
@@ -108,36 +108,40 @@ updateBiocPackageRepoObjects <- function(repo_path=".", branch=NULL,
     .run_BBS_script(python, "small_version_bumps.py", args, BBS_HOME)
 
     ## Celebrate!
-    msg <- "UPDATE OBJECTS --> UPDATE DESCRIPTION FILE --> COMMIT"
+    msg <- c("UPDATE OBJECTS",
+             " >> UPDATE DESCRIPTION FILE",
+             " >> COMMIT")
     if (push)
-        msg <- c(msg, " --> PUSH")
+        msg <- c(msg, " >> PUSH")
     msg <- c(msg, " SUCCESSFUL.")
     message(msg)
     invisible(code)
 }
 
-### Return a named integer vector **parallel** to 'all_repo_paths'.
-updateAllBiocPackageRepoObjects <- function(all_repo_paths=".",
+### Return a named integer vector **parallel** to 'all_repopaths'.
+updateAllBiocPackageRepoObjects <- function(all_repopaths=".",
                                             skipped_repos=NULL, ...)
 {
     FUN <- function(i) {
-        repo_path <- all_repo_paths[[i]]
+        repopath <- all_repopaths[[i]]
         message("")
         message("=======================================",
                 "=======================================")
-        message("PROCESSING '", repo_path, "' ",
-                "(", i, "/", length(all_repo_paths), ")")
+        message("PROCESSING '", repopath, "' ",
+                "(", i, "/", length(all_repopaths), ")")
         message("---------------------------------------",
                 "---------------------------------------")
         message("")
-        if (!is.null(skipped_repos) && (repo_path %in% skipped_repos)) {
-            message("Skip repo ", repo_path, " ==> ", .SKIPPED_PACKAGE)
+        if (!is.null(skipped_repos) && (repopath %in% skipped_repos)) {
+            message("Skip repo ", repopath, " ==> ", .SKIPPED_PACKAGE)
             return(.SKIPPED_PACKAGE)
         }
-        code <- updateBiocPackageRepoObjects(repo_path, ...)
+        code <- updateBiocPackageRepoObjects(repopath, ...)
+        message("")
+        message("DONE PROCESSING '", repopath, "'.")
         message("")
         code
     }
-    invisible(vapply(seq_along(all_repo_paths), FUN, integer(1)))
+    invisible(vapply(seq_along(all_repopaths), FUN, integer(1)))
 }
 

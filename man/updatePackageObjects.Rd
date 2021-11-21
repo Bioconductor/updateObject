@@ -19,10 +19,10 @@
 }
 
 \usage{
-updatePackageObjects(pkg_dirpath=".",
+updatePackageObjects(pkgpath=".",
                      filter=NULL, dry.run=FALSE)
 
-updateAllPackageObjects(all_pkgs, skipped_pkgs=NULL,
+updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL,
                      filter=NULL, dry.run=FALSE)
 
 ## Low-level utilities:
@@ -33,7 +33,7 @@ collect_rda_files(dirpath=".")
 }
 
 \arguments{
-  \item{pkg_dirpath}{
+  \item{pkgpath}{
     The path (as a single string) to the top-level directory of a package
     source tree.
   }
@@ -53,12 +53,11 @@ collect_rda_files(dirpath=".")
     back to their original files. Set \code{dry.run} to \code{TRUE} to
     perform a trial run with no changes made.
   }
-  \item{all_pkgs}{
-    Character vector of package names. All the corresponding package
-    source trees must be in the current directory.
+  \item{all_pkgpaths}{
+    Character vector of package paths.
   }
   \item{skipped_pkgs}{
-    Character vector of package names to ignore.
+    Character vector of package paths to ignore.
   }
   \item{filepath}{
     The path (as a single string) to a file containing serialized objects.
@@ -103,7 +102,7 @@ collect_rda_files(dirpath=".")
   \code{updateObject()} returned an error).
 
   \code{updateAllPackageObjects()} returns a named integer vector
-  \emph{parallel} to \code{all_pkgs}.
+  \emph{parallel} to \code{all_pkgpaths}.
 
   \code{update_rds_file()} and \code{update_rda_file()} return -2 if
   loading the RDS or RDA file failed, -1 if \code{updateObject()} returned
@@ -116,6 +115,11 @@ collect_rda_files(dirpath=".")
 
 \seealso{
   \itemize{
+    \item \code{\link{updateBiocPackageRepoObjects}} and
+          \code{\link{updateAllBiocPackageRepoObjects}} for wrapper
+          functions that also take care of committing and pushing the
+          changes made to the packages.
+
     \item The \code{\link[BiocGenerics]{updateObject}} generic function
           in the \pkg{BiocGenerics} package.
 
