@@ -16,7 +16,7 @@
         return(BBS_HOME)
 
     ## Try current directory.
-    BBS_HOME <- "BBS"
+    BBS_HOME <- "./BBS"
     if (dir.exists(BBS_HOME))
         return(BBS_HOME)
 
@@ -45,6 +45,22 @@
     script_path
 }
 
+.run_python_script <- function(python, script, args=character(0))
+{
+    message("RUNNING '", script, " ", paste(args, collapse=" "), "'...")
+    exit_status <- system2(python, c(script, args))
+    message()
+    if (exit_status != 0L)
+        stop("'", script, "' returned an error")
+}
+
+.run_BBS_script <- function(python, script_name, args=character(0),
+                            BBS_HOME=NULL)
+{
+    script_path <- .get_BBS_script(script_name, BBS_HOME)
+    .run_python_script(python, script_path, args)
+}
+
 ### Requires Python, git (either in PATH or specified thru env var
 ### BBS_GIT_CMD), and BBS.
 updateBiocPackageRepoObjects <- function(repo_path=".", branch=NULL,
@@ -53,25 +69,26 @@ updateBiocPackageRepoObjects <- function(repo_path=".", branch=NULL,
                                          python=NULL, BBS_HOME=NULL)
 {
     python <- find_python(python)
-    clone_or_pull_repo_script <- .get_BBS_script("clone_or_pull_repo.py",
-                                                 BBS_HOME)
-    small_version_bumps_script <- .get_BBS_script("small_version_bumps.py",
-                                                 BBS_HOME)
+    ## Only as an early test.
+    .get_BBS_script("clone_or_pull_repo.py", BBS_HOME)
+    .get_BBS_script("small_version_bumps.py", BBS_HOME)
     if (is.null(commit_msg))
         commit_msg <- "Pass serialized S4 instances thru updateObject()"
 
-    ## Clone or pull package repo.
-    args <- clone_or_pull_repo_script
+    ## 1. Clone or pull package repo.
+    args <- repo_path
     if (!is.null(branch))
-        args <- c(args, "--branch", branch)
-    args <- c(args, repo_path)
-    exit_status <- system2(python, args)
-    message()
-    if (exit_status != 0L)
-        stop("'", clone_or_pull_repo_script, "' returned an error")
+        args <- c("--branch", branch, args)
+    .run_BBS_script(python, "clone_or_pull_repo.py", args, BBS_HOME)
 
-    ## Update package objects.
+    ## 2. Update package objects.
+    call <- c("updatePackageObjects(\"", repo_path, "\"")
+    if (!is.null(filter))
+        call <- c(call, ", filter=\"", filter, "\"")
+    call <- c(call, ")")
+    message("RUNNING '", call, "'...")
     code <- updatePackageObjects(repo_path, filter=filter)
+    message()
     if (code < 0)
         stop("updatePackageObjects() encountered an error")
 
@@ -80,19 +97,22 @@ updateBiocPackageRepoObjects <- function(repo_path=".", branch=NULL,
         return(FALSE)
     }
 
-    ## Bump version, update Date, commit, and push.
-    Sys.setenv("commit_msg", commit_msg)
-    Sys.setenv("new_date", Sys.Date())
-    args <- small_version_bumps_script
+    ## 3. Bump version, set current Date, commit, and push.
+    Sys.setenv(commit_msg=commit_msg)
+    Sys.setenv(new_date=as.character(Sys.Date()))
+    args <- repo_path
     if (!is.null(branch))
-        args <- c(args, "--branch", branch)
-    args <- c(args, repo_path)
-    exit_status <- system2(python, args)
-    message()
-    if (exit_status != 0L)
-        stop("'", small_version_bumps_script, "' returned an error")
+        args <- c("--branch", branch, args)
+    if (push)
+        args <- c(args, "--push")
+    .run_BBS_script(python, "small_version_bumps.py", args, BBS_HOME)
 
-    message("OPRATION SUCCESSFUL.")
+    ## Celebrate!
+    msg <- "UPDATE OBJECTS --> UPDATE DESCRIPTION FILE --> COMMIT"
+    if (push)
+        msg <- c(msg, " --> PUSH")
+    msg <- c(msg, " SUCCESSFUL.")
+    message(msg)
     TRUE
 }
 
