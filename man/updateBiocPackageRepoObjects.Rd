@@ -4,8 +4,8 @@
 \alias{updateAllBiocPackageRepoObjects}
 
 \title{Update all the serialized objects contained in a
-       Bioconductor package repository or in a set of
-       Bioconductor package repositories}
+       Bioconductor package Git repository or in a set of
+       Bioconductor package Git repositories}
 
 \description{
   \code{updateBiocPackageRepoObjects()} and
@@ -47,6 +47,9 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
     the BBS code.
   }
   \item{python}{
+    If Python is in the PATH, it will be found and everything should be fine.
+    If it's not, then provide the path to the Python executable to use via
+    the \code{python} argument. Python 3 is required.
   }
   \item{all_repopaths}{
     Character vector of paths to local Git repositories of Bioconductor
