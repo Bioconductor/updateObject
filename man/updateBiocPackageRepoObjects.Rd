@@ -26,13 +26,11 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
   \item{repopath}{
     The path (as a single string) to the local Git repository of a
     Bioconductor package.
+    See \code{?\link{prepare_git_repo_for_work}} for more information.
   }
   \item{branch}{
     The branch (as a single string) of the Git repository to work on.
-
-    If \code{NULL}, then the current branch is used (if \code{repopath}
-    already exists) or the default branch is used (if \code{repopath} does
-    not exist and needs to be cloned).
+    See \code{?\link{prepare_git_repo_for_work}} for more information.
   }
   \item{filter}{
     See \code{?\link{updatePackageObjects}}.
@@ -44,16 +42,7 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
   \item{push}{
     Whether to push the changes or not. Changes are committed but not
     pushed by default. You need push access to the package Git repository
-    at git.bioconductor.org to use \code{push=TRUE}.
-  }
-  \item{BBS_HOME}{
-    The path (supplied as a single string) to a directory containing
-    the BBS code.
-  }
-  \item{python}{
-    If Python is in the PATH, it will be found and everything should be fine.
-    If it's not, then provide the path to the Python executable to use via
-    the \code{python} argument. Python 3 is required.
+    at \url{git.bioconductor.org} in order to use \code{push=TRUE}.
   }
   \item{all_repopaths}{
     Character vector of paths to local Git repositories of Bioconductor
@@ -69,12 +58,15 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
     All the arguments passed thru \code{...} are passed down to
     \code{updateBiocPackageRepoObjects()}.
   }
+  \item{BBS_HOME,python}{
+    See \code{?\link{prepare_git_repo_for_work}}.
+  }
 }
 
 \details{
-  The git operations are performed by Python scripts located in the BBS
-  repository (\url{https://github.com/Bioconductor/BBS}). A local copy of
-  BBS is needed.
+  Note that the git operations are performed by Python scripts located in
+  the BBS repository (\url{https://github.com/Bioconductor/BBS}) at the
+  moment, so a local copy of BBS is needed.
 }
 
 \value{
@@ -89,6 +81,10 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
   \itemize{
     \item \code{\link{updatePackageObjects}} and
           \code{\link{updateAllPackageObjects}}.
+
+    \item Utility functions \code{\link{prepare_git_repo_for_work}}
+          and \code{\link{bump_version_and_commit}} used internally by
+          \code{updateBiocPackageRepoObjects} to perform the git operations.
   }
 }
 
