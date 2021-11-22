@@ -2,9 +2,12 @@ import(methods)
 importFrom(utils, capture.output)
 import(digest)
 
-import(BiocGenerics)
+importFrom(BiocGenerics, updateObject)
+importFrom(S4Vectors, wmsg, isTRUEorFALSE, isSingleString)
 
 export(
+    prepare_git_repo_for_work,
+    bump_version_and_commit,
     collect_rds_files,
     collect_rda_files,
     update_rds_file,

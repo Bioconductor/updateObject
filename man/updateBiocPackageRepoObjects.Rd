@@ -29,6 +29,10 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
   }
   \item{branch}{
     The branch (as a single string) of the Git repository to work on.
+
+    If \code{NULL}, then the current branch is used (if \code{repopath}
+    already exists) or the default branch is used (if \code{repopath} does
+    not exist and needs to be cloned).
   }
   \item{filter}{
     See \code{?\link{updatePackageObjects}}.

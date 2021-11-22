@@ -10,17 +10,17 @@ find_python <- function(python=NULL)
             python <- Sys.which("python3")
         }
         if (python == "")
-             stop("\n  No Python executable can be found in PATH.",
-                  "\n  Please use the 'python' argument to specify ",
-                  "the path to a valid\n  Python executable.")
+             stop("\n  No Python executable can be found in PATH.\n  ",
+                  wmsg("Please use the 'python' argument to specify ",
+                       "the path to a valid Python executable."))
     } else {
-        if (!is.character(python) || length(python) != 1L || is.na(python))
-            stop("'python' must be the path (supplied as a ",
-                 "single string) to a Python\n  executable")
+        if (!isSingleString(python))
+            stop(wmsg("'python' must be the path (supplied as a ",
+                      "single string) to a Python executable"))
         if (!file.exists(python) || dir.exists(python))
-            stop("\n  Invalid supplied path: \"", python, "\"",
-                 "\n  'python' must be the path (supplied as a ",
-                 "single string) to a Python\n  executable.")
+            stop("\n  Invalid supplied path: \"", python, "\"\n  ",
+                 wmsg("'python' must be the path (supplied as a ",
+                      "single string) to a Python executable."))
     }
     python <- as.character(python)
     version <- try(system2(python, "--version", stdout=TRUE, stderr=TRUE),
@@ -29,9 +29,9 @@ find_python <- function(python=NULL)
         length(version) == 0L ||
         !grepl("Python", version[[1L]], ignore.case=TRUE))
     {
-        stop("Invalid Python executable: \"", python, "\"",
-             "\n  Please use the 'python' argument to specify ",
-             "the path to a valid\n  Python executable.")
+        stop("Invalid Python executable: \"", python, "\"\n  ",
+             wmsg("Please use the 'python' argument to specify ",
+                  "the path to a valid Python executable."))
     }
     if (!grepl("Python 3\\.", version[[1L]], ignore.case=TRUE))
         stop("'", python, "' is ", version, " but Python 3 is required")
