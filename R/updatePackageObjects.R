@@ -51,16 +51,25 @@ collect_rda_files <- function(dirpath=".")
     "yaqcaffy"
 )
 
-### Make sure that the package where the class of 'x' is defined is loaded
-### before calling 'updateObject()' on 'x'.
-.load_classdef_pkg <- function(x_class)
+### A wrapper around attachNamespace() that tries to attach the package only
+### if it's not already attached.
+.attach_namespace <- function(pkg)
+{
+    if (!(paste0("package:", pkg) %in% search())) {
+        suppressMessages(suppressWarnings(suppressPackageStartupMessages(
+            attachNamespace(pkg)
+        )))
+    }
+}
+
+### Make sure that the package where the class of 'x' is defined is
+### **attached** (loaded is not enough) before calling 'updateObject()' on 'x'.
+.attach_classdef_pkg <- function(x_class)
 {
     classdef_pkg <- attr(x_class, "package")
     if (is.null(classdef_pkg) || classdef_pkg %in% .KNOWN_INVALID_CLASSDEF_PKGS)
         return()
-    suppressMessages(suppressWarnings(suppressPackageStartupMessages(
-        loadNamespace(classdef_pkg)
-    )))
+    .attach_namespace(classdef_pkg)  # do NOT use loadNamespace()
 }
 
 .update_object <- function(x, filter=NULL)
@@ -102,7 +111,7 @@ update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
         return(.LOAD_FILE_FAILED)
     }
     message("ok; ", appendLF=FALSE)
-    .load_classdef_pkg(class(x))
+    .attach_classdef_pkg(class(x))
     y <- try(.update_object(x, filter=filter), silent=TRUE)
     if (.is_try_error(y)) {
         message("returned an error ==> ",
@@ -149,7 +158,7 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
         ## the cBioPortalData package.
         ## To prevent surprises further down we force evaluation now.
         suppressMessages(suppressWarnings(force(x)))
-        .load_classdef_pkg(class(x))
+        .attach_classdef_pkg(class(x))
         y <- try(.update_object(x, filter=filter), silent=TRUE)
         if (.is_try_error(y)) {
             message("returned an error ==> ",
