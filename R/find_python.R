@@ -1,3 +1,4 @@
+### NOT used at the moment.
 find_python <- function(python=NULL)
 {
     if (is.null(python)) {
@@ -10,26 +11,26 @@ find_python <- function(python=NULL)
             python <- Sys.which("python3")
         }
         if (python == "")
-             stop("\n  No Python executable can be found in PATH.\n  ",
+             stop("\n  No Python executable can be found in your PATH.\n  ",
                   wmsg("Please use the 'python' argument to specify ",
                        "the path to a valid Python executable."))
     } else {
+        EXPLAIN <- c("'python' must be the path (supplied as ",
+                     "a single string) to a Python executable.")
         if (!isSingleString(python))
-            stop(wmsg("'python' must be the path (supplied as a ",
-                      "single string) to a Python executable"))
+            stop(wmsg(EXPLAIN))
         if (!file.exists(python) || dir.exists(python))
             stop("\n  Invalid supplied path: \"", python, "\"\n  ",
-                 wmsg("'python' must be the path (supplied as a ",
-                      "single string) to a Python executable."))
+                 wmsg(EXPLAIN, "."))
     }
     python <- as.character(python)
     version <- try(system2(python, "--version", stdout=TRUE, stderr=TRUE),
                    silent=TRUE)
     if (inherits(version, "try-error") ||
         length(version) == 0L ||
-        !grepl("Python", version[[1L]], ignore.case=TRUE))
+        !grepl("^Python ", version[[1L]], ignore.case=TRUE))
     {
-        stop("Invalid Python executable: \"", python, "\"\n  ",
+        stop("\n  Invalid Python executable: \"", python, "\"\n  ",
              wmsg("Please use the 'python' argument to specify ",
                   "the path to a valid Python executable."))
     }

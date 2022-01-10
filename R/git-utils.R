@@ -1,62 +1,95 @@
-.find_BBS_HOME <- function(BBS_HOME=NULL)
+.GIT_SERVER <- 'git.bioconductor.org'
+
+.infer_pkgname_from_path <- function(repopath)
 {
-    if (!is.null(BBS_HOME)) {
-        if (!isSingleString(BBS_HOME))
-            stop(wmsg("'BBS_HOME' must be the path (supplied as a single ",
-                      "string) to a directory containing the BBS code."))
-        return(BBS_HOME)
+    pkgname <- basename(repopath)
+    nc <- nchar(pkgname)
+    last_char <- substr(pkgname, nc, nc)
+    if (last_char %in% c("", ".", " "))
+        stop(wmsg("cannot infer package name from supplied repo path"))
+    pkgname
+}
+
+.find_git <- function(git=NULL)
+{
+    if (is.null(git)) {
+        git <- Sys.which("git")
+        if (git == "")
+             stop("\n  The git command cannot be found in your PATH.\n  ",
+                  wmsg("Please use the 'git' argument to specify ",
+                       "the path to the git command."))
+    } else {
+        EXPLAIN <- c("'git' must be the path (supplied as ",
+                     "a single string) to the git command")
+        if (!isSingleString(git))
+            stop(wmsg(EXPLAIN))
+        if (!file.exists(git) || dir.exists(git))
+            stop("\n  Invalid supplied path: \"", git, "\"\n  ",
+                 wmsg(EXPLAIN, "."))
     }
-
-    BBS_HOME <- Sys.getenv("BBS_HOME")
-    if (BBS_HOME != "")
-        return(BBS_HOME)
-
-    ## Try current directory.
-    BBS_HOME <- "./BBS"
-    if (dir.exists(BBS_HOME))
-        return(BBS_HOME)
-
-    ## Try user home.
-    BBS_HOME <- "~/BBS"
-    if (dir.exists(BBS_HOME))
-        return(BBS_HOME)
-
-    ## Try ~/github/Bioconductor/BBS (my laptop).
-    BBS_HOME <- "~/github/Bioconductor/BBS"
-    if (dir.exists(BBS_HOME))
-        return(BBS_HOME)
-
-    stop(wmsg("No local copy of the BBS code ",
-              "(https://github.com/Bioconductor/BBS)",
-              "could be found on the system. ",
-              "Make sure there is one and use the 'BBS_HOME' argument ",
-              "to specify the path to it (or define environment ",
-              "variable BBS_HOME)."))
+    git <- as.character(git)
+    version <- try(suppressWarnings(
+                     system2(git, "--version", stdout=TRUE, stderr=TRUE)
+                   ), silent=TRUE)
+    if (inherits(version, "try-error") ||
+        length(version) == 0L ||
+        !grepl("^git ", version[[1L]], ignore.case=TRUE))
+    {
+        stop("\n  Invalid git executable: \"", git, "\"\n  ",
+             wmsg("Please use the 'git' argument to specify ",
+                  "the path to a valid git executable."))
+    }
+    git
 }
 
-.get_BBS_script <- function(script_name, BBS_HOME=NULL)
+.run_git_command <- function(git, repopath=".", ...)
 {
-    BBS_HOME <- .find_BBS_HOME(BBS_HOME)
-    script_path <- file.path(BBS_HOME, "utils", script_name)
-    if (!file.exists(script_path))
-        stop("'", script_path, "' not found.\n  Is 'BBS_HOME' set correctly?")
-    script_path
+    stopifnot(isSingleString(repopath))
+    oldwd <- getwd()
+    setwd(repopath)
+    on.exit(setwd(oldwd))
+    suppressWarnings(system2(git, ...))
 }
 
-.run_python_script <- function(python, script, args=character(0))
+.is_git_repo <- function(git, repopath=".")
 {
-    message("RUNNING '", script, " ", paste(args, collapse=" "), "'...")
-    exit_status <- system2(python, c(script, args))
-    message()
-    if (exit_status != 0L)
-        stop("'", script, "' returned an error")
+    if (!dir.exists(repopath))
+        return(FALSE)
+    args <- c("status", "--porcelain")
+    stderr <- .run_git_command(git, repopath, args, stderr=TRUE)
+    is.null(attributes(stderr)[["status"]])
 }
 
-.run_BBS_script <- function(python, script_name, args=character(0),
-                            BBS_HOME=NULL)
+### A more cautious version of .is_git_repo() that also makes sure that
+### the repo doesn't contain uncommitted changes.
+.check_git_repo_is_workable <- function(git, repopath=".")
 {
-    script_path <- .get_BBS_script(script_name, BBS_HOME)
-    .run_python_script(python, script_path, args)
+    if (!dir.exists(repopath))
+        stop(wmsg("the supplied path is not a directory"))
+    args <- c("status", "--porcelain")
+    stderr <- .run_git_command(git, repopath, args, stderr=TRUE)
+    if (!is.null(attributes(stderr)[["status"]]))
+        stop(wmsg("not a Git repo: ", repopath))
+    if (length(stderr) != 0L && substr(stderr[[1L]], 1L, 1L) != "?")
+        stop(wmsg("the repo has uncommitted changes"))
+}
+
+.git_pull <- function(git, repopath=".", branch=NULL)
+{
+    if (!is.null(branch))
+        .run_git_command(git, repopath, paste("checkout", branch))
+    .run_git_command(git, repopath, "pull")
+}
+
+.git_clone_bioc_package <- function(git, pkgname, branch=NULL, repopath=NULL)
+{
+    args <- "clone"
+    if (!is.null(branch))
+        args <- c(args, paste("--branch", branch))
+    args <- c(args, sprintf("git@%s:packages/%s.git", .GIT_SERVER, pkgname))
+    if (!is.null(repopath))
+        args <- c(args, repopath)
+    system2(git, args)
 }
 
 ### Prepare the Git repo for work by:
@@ -65,33 +98,44 @@
 ###   already exists. But first we check for uncommitted changes and
 ###   raise an error if there are. We don't want to touch a local repo that
 ###   has uncommitted changes!
-### Requires git (either in PATH or specified thru env var BBS_GIT_CMD),
-### BBS, and Python.
-### TODO: Drop dependency on BBS and Python by re-implementing what
-### 'clone_or_pull_repo.py' does with direct calls to git (via system2()).
-prepare_git_repo_for_work <- function(repopath=".", branch=NULL,
-                                      BBS_HOME=NULL, python=NULL)
+prepare_git_repo_for_work <- function(repopath=".", branch=NULL, git=NULL)
 {
     if (!isSingleString(repopath))
         stop(wmsg("'repopath' must be a single string"))
     if (!is.null(branch) && !isSingleString(branch))
         stop(wmsg("'branch' must be NULL or a single string"))
+    git <- .find_git(git)
 
-    python <- find_python(python)
-
-    args <- repopath
-    if (!is.null(branch))
-        args <- c("--branch", branch, args)
-    .run_BBS_script(python, "clone_or_pull_repo.py", args, BBS_HOME)
+    if (file.exists(repopath)) {
+        ## Pull.
+        .check_git_repo_is_workable(git, repopath)
+        .git_pull(git, repopath, branch)
+    } else {
+        ## Clone.
+        pkgname <- .infer_pkgname_from_path(repopath)
+        .git_clone_bioc_package(git, pkgname, branch, repopath)
+    }
 }
 
-### Bump package version, set current Date, commit, and push.
-### Requires git (either in PATH or specified thru env var BBS_GIT_CMD),
-### BBS, and Python.
-### TODO: Drop dependency on BBS and Python by re-implementing what
-### 'small_version_bumps.py' does with direct calls to git (via system2()).
+.git_commit_all_changes <- function(git, repopath=".", commit_msg)
+{
+    ## If 'repopath' is not a Git repo, 'git --no-pager diff' will spit
+    ## out many screens of ugly output!
+    if(!.is_git_repo(git, repopath))
+        stop(wmsg("not a Git repo: ", repopath))
+    .run_git_command(git, repopath, c("--no-pager", "diff"))
+    commit_msg <- gsub("\"", "\\\"", commit_msg)
+    args <- c("commit", "-a", sprintf("-m \"%s\"", commit_msg))
+    .run_git_command(git, repopath, args)
+}
+
+.git_push <- function(git, repopath=".")
+{
+    .run_git_command(git, repopath, "push")
+}
+
 bump_version_and_commit <- function(repopath=".", commit_msg=NULL, push=FALSE,
-                                    BBS_HOME=NULL, python=NULL)
+                                    git=NULL)
 {
     if (!isSingleString(repopath))
         stop(wmsg("'repopath' must be a single string"))
@@ -102,14 +146,11 @@ bump_version_and_commit <- function(repopath=".", commit_msg=NULL, push=FALSE,
     }
     if (!isTRUEorFALSE(push))
         stop(wmsg("'push' must be TRUE or FALSE"))
+    git <- .find_git(git)
 
-    python <- find_python(python)
-
-    Sys.setenv(commit_msg=commit_msg)
-    Sys.setenv(new_date=as.character(Sys.Date()))
-    args <- repopath
+    bump_pkg_version(repopath, update_date=TRUE)
+    .git_commit_all_changes(git, repopath, commit_msg)
     if (push)
-        args <- c(args, "--push")
-    .run_BBS_script(python, "small_version_bumps.py", args, BBS_HOME)
+        .git_push(git, repopath)
 }
 

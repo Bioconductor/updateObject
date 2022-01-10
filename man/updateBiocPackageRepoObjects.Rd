@@ -17,7 +17,7 @@
 
 \usage{
 updateBiocPackageRepoObjects(repopath=".", branch=NULL, filter=NULL,
-        commit_msg=NULL, push=FALSE, BBS_HOME=NULL, python=NULL)
+        commit_msg=NULL, push=FALSE, git=NULL)
 
 updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
 }
@@ -58,15 +58,9 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
     All the arguments passed thru \code{...} are passed down to
     \code{updateBiocPackageRepoObjects()}.
   }
-  \item{BBS_HOME,python}{
+  \item{git}{
     See \code{?\link{prepare_git_repo_for_work}}.
   }
-}
-
-\details{
-  Note that the git operations are performed by Python scripts located in
-  the BBS repository (\url{https://github.com/Bioconductor/BBS}) at the
-  moment, so a local copy of BBS is needed.
 }
 
 \value{

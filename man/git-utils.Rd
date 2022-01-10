@@ -10,20 +10,14 @@
 \description{
   \code{prepare_git_repo_for_work()} and \code{bump_version_and_commit()}
   are used internally by \code{\link{updateBiocPackageRepoObjects}()} to
-  perform the git operations.
-
-  Note that they both call Python scripts located in the BBS (Bioconductor
-  Build System) repository (\url{https://github.com/Bioconductor/BBS}) at
-  the moment, so a local copy of BBS is needed.
-  This requirement might go away in the future.
+  perform Git operations.
 }
 
 \usage{
-prepare_git_repo_for_work(repopath=".", branch=NULL,
-                          BBS_HOME=NULL, python=NULL)
+prepare_git_repo_for_work(repopath=".", branch=NULL, git=NULL)
 
 bump_version_and_commit(repopath=".", commit_msg=NULL, push=FALSE,
-                        BBS_HOME=NULL, python=NULL)
+                        git=NULL)
 }
 
 \arguments{
@@ -50,12 +44,9 @@ bump_version_and_commit(repopath=".", commit_msg=NULL, push=FALSE,
     pushed by default. You need push access to the package Git repository
     at \url{git.bioconductor.org} in order to use \code{push=TRUE}.
   }
-  \item{BBS_HOME,python}{
-    Where to find the local BBS repository and Python.
-
-    If Python is in the PATH, it will be found and everything should be fine.
-    If it's not, then please provide the path to the Python executable to
-    use via the \code{python} argument. Python 3 is required.
+  \item{git}{
+    The path (as a single string) to the git command if it's not in the
+    PATH.
   }
 }
 

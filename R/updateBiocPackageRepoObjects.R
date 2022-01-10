@@ -1,9 +1,8 @@
-### Requires git (either in PATH or specified thru env var BBS_GIT_CMD),
-### BBS, and Python.
+### Requires git.
 updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
                                          filter=NULL,
                                          commit_msg=NULL, push=FALSE,
-                                         BBS_HOME=NULL, python=NULL)
+                                         git=NULL)
 {
     if (is.null(commit_msg)) {
         commit_msg <- "Pass serialized S4 instances thru updateObject()"
@@ -12,8 +11,7 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
     }
 
     ## 1. Prepare the Git repo for work (clone or pull).
-    prepare_git_repo_for_work(repopath, branch,
-                              BBS_HOME, python)
+    prepare_git_repo_for_work(repopath, branch, git)
 
     ## 2. Update package objects.
     call <- c("updatePackageObjects(\"", repopath, "\"")
@@ -32,8 +30,7 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
     }
 
     ## 3. Bump package version, set current Date, commit, and push.
-    bump_version_and_commit(repopath, commit_msg, push,
-                            BBS_HOME, python)
+    bump_version_and_commit(repopath, commit_msg, push, git)
 
     ## Celebrate!
     msg <- c("UPDATE OBJECTS",

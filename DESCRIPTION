@@ -5,7 +5,7 @@ Description: A set of tools built around updateObject() to work with old
 biocViews: Infrastructure, DataRepresentation
 URL: https://bioconductor.org/packages/updateObject
 BugReports: https://github.com/Bioconductor/updateObject/issues
-Version: 0.1.7
+Version: 0.2.0
 License: Artistic-2.0
 Encoding: UTF-8
 Author: Hervé Pagès <hpages.on.github@gmail.com>
@@ -15,4 +15,5 @@ Imports: utils, digest
 Suggests: SummarizedExperiment, GenomicAlignments, DelayedArray, HDF5Array,
 	SingleCellExperiment, MultiAssayExperiment, bsseq, InteractionSet,
 	GSEABase, Gviz
-Collate: find_python.R git-utils.R updatePackageObjects.R updateBiocPackageRepoObjects.R
+SystemRequirements: git
+Collate: bump_pkg_version.R find_python.R git-utils.R updatePackageObjects.R updateBiocPackageRepoObjects.R
