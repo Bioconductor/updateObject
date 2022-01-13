@@ -1,20 +1,16 @@
-### Nothing in this file is exported.
+### =========================================================================
+### bump_pkg_version()
+### -------------------------------------------------------------------------
 
-.small_version_bump <- function(version)
-{
-    suffix <- sub("(.*)[^0-9]([0-9]*)$", "\\2", version)
-    prefix <- substr(version, 1L, nchar(version) - nchar(suffix))
-    paste0(prefix, as.character(as.integer(suffix) + 1L))
-}
 
-readLinesWithEOLs <- function(con)
+.readLinesWithEOLs <- function(con)
 {
     if (is.character(con)) {
         con <- file(con, "rb")
         on.exit(close(con))
     }
     chunks <- list()
-    while (length(chunk <- readBin(con, raw(), n=500L)) != 0L) {
+    while (length(chunk <- readBin(con, raw(), n=5000L)) != 0L) {
         chunks <- c(chunks, list(chunk))
     }
     if (length(chunks) == 0L)
@@ -22,6 +18,13 @@ readLinesWithEOLs <- function(con)
     rawtext <- rawToChar(unlist(chunks))
     rawlines <- strsplit(rawtext, split="\n", fixed=TRUE)[[1L]]
     paste0(rawlines, "\n")
+}
+
+.small_version_bump <- function(version)
+{
+    suffix <- sub("(.*)[^0-9]([0-9]*)$", "\\2", version)
+    prefix <- substr(version, 1L, nchar(version) - nchar(suffix))
+    paste0(prefix, as.character(as.integer(suffix) + 1L))
 }
 
 ### FUN is the callback function that will be used to update the value
@@ -43,15 +46,16 @@ readLinesWithEOLs <- function(con)
 }
 
 ### We want to preserve the EOLs used in the DESCRIPTION file, whether
-### they are LFs or CRLFs. This is why we use readLinesWithEOLs() and
+### they are LFs or CRLFs. This is why we use .readLinesWithEOLs() and
 ### writeLines(..., sep="") to read and write the file, respectively.
-bump_pkg_version <- function(repopath=".", update_date=FALSE)
+bump_pkg_version <- function(pkgpath=".", update.Date=FALSE)
 {
-    stopifnot(isSingleString(repopath))
-    descpath <- file.path(repopath, "DESCRIPTION")
-    lines <- readLinesWithEOLs(descpath)
+    stopifnot(isSingleString(pkgpath))
+    stopifnot(isTRUEorFALSE(update.Date))
+    descpath <- file.path(pkgpath, "DESCRIPTION")
+    lines <- .readLinesWithEOLs(descpath)
     lines <- .update_dcf_field(lines, "Version", .small_version_bump)
-    if (update_date) {
+    if (update.Date) {
         lines <- .update_dcf_field(lines, "Date",
                      function(val) paste0(" ", as.character(Sys.Date())))
     }

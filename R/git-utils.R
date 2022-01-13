@@ -1,3 +1,8 @@
+### =========================================================================
+### Git-related utility functions
+### -------------------------------------------------------------------------
+
+
 .GIT_SERVER <- 'git.bioconductor.org'
 
 .infer_pkgname_from_path <- function(repopath)
@@ -124,7 +129,7 @@ prepare_git_repo_for_work <- function(repopath=".", branch=NULL, git=NULL)
     if(!.is_git_repo(git, repopath))
         stop(wmsg("not a Git repo: ", repopath))
     .run_git_command(git, repopath, c("--no-pager", "diff"))
-    commit_msg <- gsub("\"", "\\\"", commit_msg)
+    commit_msg <- gsub("\"", "\\\\\"", commit_msg)
     args <- c("commit", "-a", sprintf("-m \"%s\"", commit_msg))
     .run_git_command(git, repopath, args)
 }
@@ -134,21 +139,16 @@ prepare_git_repo_for_work <- function(repopath=".", branch=NULL, git=NULL)
     .run_git_command(git, repopath, "push")
 }
 
-bump_version_and_commit <- function(repopath=".", commit_msg=NULL, push=FALSE,
-                                    git=NULL)
+commit_changes <- function(repopath=".", commit_msg, push=FALSE, git=NULL)
 {
     if (!isSingleString(repopath))
         stop(wmsg("'repopath' must be a single string"))
-    if (is.null(commit_msg)) {
-        commit_msg <- "version bump"
-    } else if (!isSingleString(commit_msg) || commit_msg == "") {
+    if (!isSingleString(commit_msg) || commit_msg == "")
         stop(wmsg("'commit_msg' must be a single (non-empty) string"))
-    }
     if (!isTRUEorFALSE(push))
         stop(wmsg("'push' must be TRUE or FALSE"))
     git <- .find_git(git)
 
-    bump_pkg_version(repopath, update_date=TRUE)
     .git_commit_all_changes(git, repopath, commit_msg)
     if (push)
         .git_push(git, repopath)

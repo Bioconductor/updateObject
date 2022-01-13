@@ -77,8 +77,8 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
           \code{\link{updateAllPackageObjects}}.
 
     \item Utility functions \code{\link{prepare_git_repo_for_work}}
-          and \code{\link{bump_version_and_commit}} used internally by
-          \code{updateBiocPackageRepoObjects} to perform the git operations.
+          and \code{\link{commit_changes}} which are used internally by
+          \code{updateBiocPackageRepoObjects} to perform the Git operations.
   }
 }
 

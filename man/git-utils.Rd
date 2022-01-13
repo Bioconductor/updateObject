@@ -2,22 +2,21 @@
 
 \alias{git-utils}
 \alias{prepare_git_repo_for_work}
-\alias{bump_version_and_commit}
+\alias{commit_changes}
 
 \title{Convenience Git-related utility functions used by
        updateBiocPackageRepoObjects()}
 
 \description{
-  \code{prepare_git_repo_for_work()} and \code{bump_version_and_commit()}
-  are used internally by \code{\link{updateBiocPackageRepoObjects}()} to
-  perform Git operations.
+  \code{prepare_git_repo_for_work()} and \code{commit_changes()}
+  are used internally by \code{\link{updateBiocPackageRepoObjects}()}
+  to perform Git operations.
 }
 
 \usage{
 prepare_git_repo_for_work(repopath=".", branch=NULL, git=NULL)
 
-bump_version_and_commit(repopath=".", commit_msg=NULL, push=FALSE,
-                        git=NULL)
+commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
 }
 
 \arguments{
@@ -37,7 +36,7 @@ bump_version_and_commit(repopath=".", commit_msg=NULL, push=FALSE,
     does not exist and needs to be cloned).
   }
   \item{commit_msg}{
-    The Git commit message. By default \code{"version bump"} is used.
+    The Git commit message.
   }
   \item{push}{
     Whether to push the changes or not. Changes are committed but not
@@ -52,7 +51,11 @@ bump_version_and_commit(repopath=".", commit_msg=NULL, push=FALSE,
 
 \seealso{
   \itemize{
-    \item \code{\link{updateBiocPackageRepoObjects}}.
+    \item \code{\link{updateBiocPackageRepoObjects}} which uses
+          \code{prepare_git_repo_for_work} and \code{commit_changes}
+          internally.
+
+    \item \code{\link{bump_pkg_version}}.
   }
 }
 
@@ -60,10 +63,8 @@ bump_version_and_commit(repopath=".", commit_msg=NULL, push=FALSE,
 repopath <- file.path(tempdir(), "limma")
 
 prepare_git_repo_for_work(repopath)
-
-## Note that the 'Date:' field (if present) gets updated to the
-## current date:
-bump_version_and_commit(repopath, push=FALSE)
+bump_pkg_version(repopath, update.Date=TRUE)
+commit_changes(repopath, commit_msg="version bump", push=FALSE)
 
 unlink(repopath, recursive=TRUE)
 }

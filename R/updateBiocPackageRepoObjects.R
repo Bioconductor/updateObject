@@ -1,3 +1,8 @@
+### =========================================================================
+### updateBiocPackageRepoObjects() and updateAllBiocPackageRepoObjects()
+### -------------------------------------------------------------------------
+
+
 ### Requires git.
 updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
                                          filter=NULL,
@@ -17,9 +22,9 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
     call <- c("updatePackageObjects(\"", repopath, "\"")
     if (!is.null(filter))
         call <- c(call, ", filter=\"", filter, "\"")
-    call <- c(call, ")")
+    call <- c(call, ", bump.Version=TRUE)")
     message("RUNNING '", call, "'...")
-    code <- updatePackageObjects(repopath, filter=filter)
+    code <- updatePackageObjects(repopath, filter=filter, bump.Version=TRUE)
     message()
     if (code < 0)
         stop("updatePackageObjects() encountered an error")
@@ -30,7 +35,7 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
     }
 
     ## 3. Bump package version, set current Date, commit, and push.
-    bump_version_and_commit(repopath, commit_msg, push, git)
+    commit_changes(repopath, commit_msg, push, git)
 
     ## Celebrate!
     msg <- c("UPDATE OBJECTS",

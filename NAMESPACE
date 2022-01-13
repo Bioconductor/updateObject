@@ -6,8 +6,9 @@ importFrom(BiocGenerics, updateObject)
 importFrom(S4Vectors, wmsg, isTRUEorFALSE, isSingleString)
 
 export(
+    bump_pkg_version,
     prepare_git_repo_for_work,
-    bump_version_and_commit,
+    commit_changes,
     collect_rds_files,
     collect_rda_files,
     update_rds_file,

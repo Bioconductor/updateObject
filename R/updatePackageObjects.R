@@ -1,3 +1,8 @@
+### =========================================================================
+### updatePackageObjects() and updateAllPackageObjects()
+### -------------------------------------------------------------------------
+
+
 collect_files <- function(dirpath, fileexts)
 {
     if (!(is.character(dirpath) &&
@@ -189,8 +194,20 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
 }
 
 ### Return nb of updated files or negative error code.
-updatePackageObjects <- function(pkgpath=".", filter=NULL, dry.run=FALSE)
+updatePackageObjects <- function(pkgpath=".", filter=NULL,
+                                 dry.run=FALSE, bump.Version=FALSE)
 {
+    if (!isSingleString(pkgpath))
+        stop(wmsg("'pkgpath' must be a single string containig the path ",
+                  "to the top-level directory of a package source tree"))
+    if (!(is.null(filter) || isSingleString(filter)))
+        stop(wmsg("'filter' must be NULL or a single string containing ",
+                  "a regular expression"))
+    if (!isTRUEorFALSE(dry.run))
+        stop(wmsg("'dry.run' must be TRUE or FALSE"))
+    if (!isTRUEorFALSE(bump.Version))
+        stop(wmsg("'bump.Version' must be TRUE or FALSE"))
+
     codes <- integer(0)
     rds_paths <- collect_rds_files(pkgpath)
     for (filepath in rds_paths) {
@@ -202,6 +219,8 @@ updatePackageObjects <- function(pkgpath=".", filter=NULL, dry.run=FALSE)
         code <- update_rda_file(filepath, filter=filter, dry.run=dry.run)
         codes <- c(codes, code)
     }
+    if (bump.Version)
+        bump_pkg_version(pkgpath, update.Date=TRUE)
     if (any(codes < 0L))
         return(min(codes))
     sum(codes)
@@ -209,7 +228,8 @@ updatePackageObjects <- function(pkgpath=".", filter=NULL, dry.run=FALSE)
 
 ### Return a named integer vector **parallel** to 'all_pkgpaths'.
 updateAllPackageObjects <- function(all_pkgpaths, skipped_pkgs=NULL,
-                                    filter=NULL, dry.run=FALSE)
+                                    filter=NULL,
+                                    dry.run=FALSE, bump.Version=FALSE)
 {
     vapply(all_pkgpaths,
         function(pkgpath) {
@@ -217,7 +237,8 @@ updateAllPackageObjects <- function(all_pkgpaths, skipped_pkgs=NULL,
                 message("Skip package ", pkgpath, " ==> ", .SKIPPED_PACKAGE)
                 return(.SKIPPED_PACKAGE)
             }
-            updatePackageObjects(pkgpath, filter=filter, dry.run=dry.run)
+            updatePackageObjects(pkgpath, filter=filter,
+                                 dry.run=dry.run, bump.Version=bump.Version)
         },
         integer(1)
     )

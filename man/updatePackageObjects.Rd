@@ -19,11 +19,11 @@
 }
 
 \usage{
-updatePackageObjects(pkgpath=".",
-                     filter=NULL, dry.run=FALSE)
+updatePackageObjects(pkgpath=".", filter=NULL,
+                     dry.run=FALSE, bump.Version=FALSE)
 
-updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL,
-                     filter=NULL, dry.run=FALSE)
+updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL, filter=NULL,
+                     dry.run=FALSE, bump.Version=FALSE)
 
 ## Low-level utilities:
 update_rds_file(filepath, filter=NULL, dry.run=FALSE)
@@ -52,6 +52,13 @@ collect_rda_files(dirpath=".")
     \code{TRUE} or \code{FALSE}. By default, updated objects are written
     back to their original files. Set \code{dry.run} to \code{TRUE} to
     perform a trial run with no changes made.
+  }
+  \item{bump.Version}{
+    \code{TRUE} or \code{FALSE}. If \code{TRUE} then the package version is
+    bumped, that is, the Version field in its DESCRIPTION file gets bumped
+    from X.Y.Z to X.Y.(Z+1). For example, 2.0.9 becomes 2.0.10.
+
+    Additionally, the Date field (if present) gets updated to the current date.
   }
   \item{all_pkgpaths}{
     Character vector of package paths.
@@ -122,6 +129,10 @@ collect_rda_files(dirpath=".")
 
     \item The \code{\link[BiocGenerics]{updateObject}} generic function
           in the \pkg{BiocGenerics} package.
+
+    \item \code{\link{bump_pkg_version}} used internally by
+          \code{updatePackageObjects} and \code{updateAllPackageObjects}
+          when \code{bump.Version=TRUE}.
 
     \item The \code{\link[utils]{capture.output}} function in the \pkg{utils}
           package.
