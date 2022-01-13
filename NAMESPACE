@@ -6,13 +6,14 @@ importFrom(BiocGenerics, updateObject)
 importFrom(S4Vectors, wmsg, isTRUEorFALSE, isSingleString)
 
 export(
-    bump_pkg_version,
-    prepare_git_repo_for_work,
-    commit_changes,
+    updateSerializedObjects,
     collect_rds_files,
     collect_rda_files,
     update_rds_file,
     update_rda_file,
+    bump_pkg_version,
+    prepare_git_repo_for_work,
+    commit_changes,
     updatePackageObjects,
     updateAllPackageObjects,
     updateBiocPackageRepoObjects,

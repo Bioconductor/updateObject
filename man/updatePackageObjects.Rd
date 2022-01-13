@@ -1,13 +1,9 @@
 \name{updatePackageObjects}
 
-\alias{collect_rds_files}
-\alias{collect_rda_files}
-\alias{update_rds_file}
-\alias{update_rda_file}
 \alias{updatePackageObjects}
 \alias{updateAllPackageObjects}
 
-\title{Update all the serialized objects contained in a package
+\title{Update the serialized objects contained in a package
        or in a set of packages}
 
 \description{
@@ -24,12 +20,6 @@ updatePackageObjects(pkgpath=".", filter=NULL,
 
 updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL, filter=NULL,
                      dry.run=FALSE, bump.Version=FALSE)
-
-## Low-level utilities:
-update_rds_file(filepath, filter=NULL, dry.run=FALSE)
-update_rda_file(filepath, filter=NULL, dry.run=FALSE)
-collect_rds_files(dirpath=".")
-collect_rda_files(dirpath=".")
 }
 
 \arguments{
@@ -37,21 +27,9 @@ collect_rda_files(dirpath=".")
     The path (as a single string) to the top-level directory of a package
     source tree.
   }
-  \item{filter}{
-    \code{NULL} (the default) or a single string containing a regular
-    expression.
-
-    When \code{filter} is set, only objects for which there is a match
-    in the output of \code{updateObject(object, check=FALSE, verbose=TRUE)}
-    actually get replaced with the object returned by the \code{updateObject}
-    call. See Details section below for more on this.
-
-    Note that the pattern matching is \emph{case sensitive}.
-  }
-  \item{dry.run}{
-    \code{TRUE} or \code{FALSE}. By default, updated objects are written
-    back to their original files. Set \code{dry.run} to \code{TRUE} to
-    perform a trial run with no changes made.
+  \item{filter,dry.run}{
+    These arguments are passed down to \code{updateSerializedObjects()}.
+    See \code{?\link{updateSerializedObjects}} for the details.
   }
   \item{bump.Version}{
     \code{TRUE} or \code{FALSE}. If \code{TRUE} then the package version is
@@ -66,79 +44,30 @@ collect_rda_files(dirpath=".")
   \item{skipped_pkgs}{
     Character vector of package paths to ignore.
   }
-  \item{filepath}{
-    The path (as a single string) to a file containing serialized objects.
-    This must be an RDS file (for \code{collect_rds_files}) or RDA file
-    (\code{collect_rda_files}).
-  }
-  \item{dirpath}{
-    The path (as a single string) to an arbitrary directory.
-  }
-}
-
-\details{
-  \code{update_rds_file()} and \code{update_rds_file()} use
-  \code{\link[BiocGenerics]{updateObject}()} internally to update
-  individual R objects.
-
-  If no filter is specified (the default), each object is updated with
-  \code{object <- updateObject(object, check=FALSE)}. If that turns out
-  to be a no-op, then code 0 ("nothing to update") is returned.
-  Otherwise 1 is returned.
-
-  If a filter is specified (via the \code{filter} argument) then
-  \code{updateObject(object, check=FALSE, verbose=TRUE)} is called on each
-  object and the output of the call is captured with \code{capture.output()}.
-  Only if the output contains a match for \code{filter} is the object
-  replaced with the object returned by the call. If this replacement turns
-  out to be a no-op, or if the output contained no match for \code{filter},
-  then code 0 ("nothing to update") is returned. Otherwise 1 is returned.
-
-  The pattern matching is \emph{case sensitive}.
-
-  Note that determining whether a call to \code{updateObject()} is a no-op
-  or not is done by calling \code{digest::\link[digest]{digest}()} on the
-  original object and object returned by \code{updateObject()}, and by
-  comparing the 2 hash values. This is a LOT MORE reliable than using
-  \code{identical()} which is notoriously unreliable!
 }
 
 \value{
-  \code{updatePackageObjects()} returns the number of updated files or
-  a negative error code (-2 if loading an RDS or RDA file failed, -1 if
-  \code{updateObject()} returned an error).
+  \code{updatePackageObjects()} returns the value returned by its call to
+  \code{updateSerializedObjects()}. See \code{?\link{updateSerializedObjects}}
+  for the details.
 
   \code{updateAllPackageObjects()} returns a named integer vector
   \emph{parallel} to \code{all_pkgpaths}.
-
-  \code{update_rds_file()} and \code{update_rda_file()} return -2 if
-  loading the RDS or RDA file failed, -1 if \code{updateObject()} returned
-  an error, 0 if there was nothing to update in the file, and 1 if the
-  file got updated.
-
-  \code{collect_rds_files()} and \code{collect_rda_files()} return a
-  character vector of (relative) file paths.
 }
 
 \seealso{
   \itemize{
+    \item The \code{\link{updateSerializedObjects}} function which
+          is the workhorse behind \code{updatePackageObjects}.
+
     \item \code{\link{updateBiocPackageRepoObjects}} and
           \code{\link{updateAllBiocPackageRepoObjects}} for wrapper
           functions that also take care of committing and pushing the
           changes made to the packages.
 
-    \item The \code{\link[BiocGenerics]{updateObject}} generic function
-          in the \pkg{BiocGenerics} package.
-
-    \item \code{\link{bump_pkg_version}} used internally by
+    \item \code{\link{bump_pkg_version}} which is used internally by
           \code{updatePackageObjects} and \code{updateAllPackageObjects}
           when \code{bump.Version=TRUE}.
-
-    \item The \code{\link[utils]{capture.output}} function in the \pkg{utils}
-          package.
-
-    \item The \code{\link[digest]{digest}} function in the \pkg{digest}
-          package.
   }
 }
 
