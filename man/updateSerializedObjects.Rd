@@ -45,7 +45,7 @@ update_rda_file(filepath, filter=NULL, dry.run=FALSE)
   }
   \item{dry.run}{
     \code{TRUE} or \code{FALSE}. By default, updated objects are written
-    back to their original files. Set \code{dry.run} to \code{TRUE} to
+    back to their original file. Set \code{dry.run} to \code{TRUE} to
     perform a trial run with no changes made.
   }
   \item{filepath}{
@@ -91,7 +91,7 @@ update_rda_file(filepath, filter=NULL, dry.run=FALSE)
   character vector of (relative) file paths.
 
   \code{update_rds_file()} and \code{update_rda_file()} return a single
-  integer code which is:
+  integer which is one of the following codes:
   \itemize{
     \item -2 if loading the RDS or RDA file failed;
     \item -1 if \code{updateObject()} returned an error;
@@ -102,8 +102,8 @@ update_rda_file(filepath, filter=NULL, dry.run=FALSE)
 
 \seealso{
   \itemize{
-    \item \code{\link{updatePackageObjects}} which is just a thin wrapper
-          around \code{updateSerializedObjects}.
+    \item The \code{\link{updatePackageObjects}} function which is just a
+          thin wrapper around \code{updateSerializedObjects}.
 
     \item The \code{\link[BiocGenerics]{updateObject}} generic function
           in the \pkg{BiocGenerics} package.
@@ -117,5 +117,31 @@ update_rda_file(filepath, filter=NULL, dry.run=FALSE)
 }
 
 \examples{
+## --- Without a filter ---
+
+dirpath <- system.file("extdata", package="updateObject")
+
+## updateSerializedObjects() prints one line per processed file:
+updateSerializedObjects(dirpath, dry.run=TRUE)
+
+## Note that updateSerializedObjects() needs to attach/load the packages
+## in which the classes of the objects to update are defined. So
+## sessionInfo() will typically report more attached and loaded packages
+## after a updateSerializedObjects() run than before:
+sessionInfo()
+
+## Also updateSerializedObjects() will raise an error if it fails to
+## attach or load a package (typically because the package is missing).
+## It will NOT try to install the package.
+
+## --- With a filter ---
+
+## We want to filter on the presence of the **word** "DataFrame" in
+## the output of 'updateObject( , check=FALSE, verbose=TRUE)'. We can't
+## just set 'filter' to '"DataFrame" for that as this would also produce
+## matches in the presence of strings like "AnnotatedDataFrame":
+filter <- "\\bDataFrame\\b"
+
+updateSerializedObjects(dirpath, filter=filter, dry.run=TRUE)
 }
 \keyword{utilities}

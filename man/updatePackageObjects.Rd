@@ -61,13 +61,13 @@ updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL, filter=NULL,
           is the workhorse behind \code{updatePackageObjects}.
 
     \item \code{\link{updateBiocPackageRepoObjects}} and
-          \code{\link{updateAllBiocPackageRepoObjects}} for wrapper
-          functions that also take care of committing and pushing the
-          changes made to the packages.
+          \code{\link{updateAllBiocPackageRepoObjects}} which are
+          wrapper functions that also take care of committing and
+          pushing the changes made to the packages.
 
-    \item \code{\link{bump_pkg_version}} which is used internally by
-          \code{updatePackageObjects} and \code{updateAllPackageObjects}
-          when \code{bump.Version=TRUE}.
+    \item The \code{\link{bump_pkg_version}} function which is
+          used internally by \code{updatePackageObjects} and
+          \code{updateAllPackageObjects} when \code{bump.Version=TRUE}.
   }
 }
 
