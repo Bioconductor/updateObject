@@ -190,7 +190,7 @@ UPDATEOBJECT_FAILURE <- c(
     "xcms"
 )
 
-## Contain files to push larger than 5 Mb
+## Contain files to push larger than 5 Mb.
 PUSH_FAILURE <- c(
     "BiocSklearn",
     "BubbleTree",
@@ -201,9 +201,12 @@ PUSH_FAILURE <- c(
     "vtpnet"
 )
 
+## Skipped for other reasons e.g. contain objects for which
+## updateObject() takes forever or the package needs to be
+## installed but cannot at the moment.
 OTHER_SKIPPED_REPOS <- c(
-    "BaalChIP", "BiGGR", "CytoTree", "gwascat", "mirIntegrator",
-    "oposSOM", "PFP", "ROntoTools", "SLGI", "SNPhood"
+    "BaalChIP", "BiGGR", "CytoTree", "gwascat",
+    "mirIntegrator", "oposSOM", "PFP", "ROntoTools", "SLGI"
 )
 
 SKIPPED_REPOS <- c(
