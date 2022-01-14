@@ -107,7 +107,9 @@ updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13",
 ## ---------------------------------------------------------------------
 
 ## Let's assume that the current directory is populated with the
-## Git repositories of all Bioconductor software packages:
+## Git repositories of all Bioconductor software packages and that
+## we have push access to them:
+
 ALL_REPOS <- dir()  # get list of package repos to update
 
 READ_RDS_FAILURE <- c(
@@ -218,6 +220,7 @@ FILTER <- "\\bDataFrame\\b"
 system.time(
     codes <- updateAllBiocPackageRepoObjects(ALL_REPOS,
                                              skipped_repos=SKIPPED_REPOS,
+                                             branch="master",
                                              filter=FILTER,
                                              push=TRUE)
 )
