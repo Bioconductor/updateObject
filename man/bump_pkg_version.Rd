@@ -33,6 +33,34 @@ bump_pkg_version(pkgpath=".", update.Date=FALSE)
 }
 
 \examples{
-## See '?commit_changes'.
+## Create dummy R package:
+create_dummy_pkg <- function(pkgname, pkgpath) {
+    pkgdesc <- c(
+        Package=pkgname,
+        Title="Not a real package",
+        Description="I'm not real u know.",
+        Version="3.0.9",
+        Date="1969-07-20"
+    )
+    dir.create(pkgpath)
+    descpath <- file.path(pkgpath, "DESCRIPTION")
+    write.dcf(rbind(pkgdesc), descpath)
+    descpath
+}
+
+pkgname <- "Dummy"
+pkgpath <- file.path(tempdir(), pkgname)
+descpath <- create_dummy_pkg(pkgname, pkgpath)
+
+## Bump its Version:
+bump_pkg_version(pkgpath)
+cat(readLines(descpath), sep="\n")
+
+## Bump its Version (again) and set Date to current date:
+bump_pkg_version(pkgpath, update.Date=TRUE)
+cat(readLines(descpath), sep="\n")
+
+## Throw it away:
+unlink(pkgpath, recursive=TRUE)
 }
 \keyword{utilities}
