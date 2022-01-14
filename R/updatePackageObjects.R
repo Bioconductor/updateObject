@@ -7,15 +7,17 @@
 updatePackageObjects <- function(pkgpath=".", filter=NULL,
                                  dry.run=FALSE, bump.Version=FALSE)
 {
-    if (!isSingleString(pkgpath))
-        stop(wmsg("'pkgpath' must be a single string containig the path ",
-                  "to the top-level directory of a package source tree"))
+    get_descpath(pkgpath)  # just to get an early check of 'pkgpath'
     if (!isTRUEorFALSE(bump.Version))
         stop(wmsg("'bump.Version' must be TRUE or FALSE"))
 
     ans <- updateSerializedObjects(pkgpath, filter=filter, dry.run=dry.run)
-    if (bump.Version)
-        bump_pkg_version(pkgpath, update.Date=TRUE)
+    if (bump.Version) {
+        ## bump_pkg_version() calls get_descpath() again so if the above
+        ## call to get_descpath() emitted a warning then bump_pkg_version()
+        ## will emit that same warning again.
+        suppressWarnings(bump_pkg_version(pkgpath, update.Date=TRUE))
+    }
     ans
 }
 

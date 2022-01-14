@@ -14,8 +14,8 @@ bump_pkg_version(pkgpath=".", update.Date=FALSE)
 
 \arguments{
   \item{pkgpath}{
-    The path (as a single string) to the top-level directory of a package
-    source tree.
+    The path (as a single string) to the top-level directory
+    of an R package source tree.
   }
   \item{update.Date}{
     \code{TRUE} or \code{FALSE}. If \code{TRUE} then the Date field (if

@@ -45,14 +45,35 @@
     lines
 }
 
+get_descpath <- function(pkgpath)
+{
+    if (!isSingleString(pkgpath))
+        stop(wmsg("'pkgpath' must be a single string containig the path ",
+                  "to the top-level directory of an R package source tree"))
+    if (!file.exists(pkgpath))
+        stop(wmsg("Invalid path: ", pkgpath))
+    if (!dir.exists(pkgpath))
+        stop(wmsg("Not a directory: ", pkgpath))
+    descpath <- file.path(pkgpath, "DESCRIPTION")
+    if (!file.exists(descpath))
+        stop(wmsg("Not an R package source tree: ", pkgpath))
+    if (dir.exists(file.path(pkgpath, "Meta")))
+        warning(wmsg("Are you sure that this directory contains ",
+                     "an R package **source** tree?"),
+                "\n\n    ", pkgpath, "\n\n  ",
+                wmsg("It contains a 'Meta' folder which suggests that ",
+                     "it is an R package **installation** directory, ",
+                     "or the result of extracting a **binary** package."))
+    descpath
+}
+
 ### We want to preserve the EOLs used in the DESCRIPTION file, whether
 ### they are LFs or CRLFs. This is why we use .readLinesWithEOLs() and
 ### writeLines(..., sep="") to read and write the file, respectively.
 bump_pkg_version <- function(pkgpath=".", update.Date=FALSE)
 {
-    stopifnot(isSingleString(pkgpath))
+    descpath <- get_descpath(pkgpath)
     stopifnot(isTRUEorFALSE(update.Date))
-    descpath <- file.path(pkgpath, "DESCRIPTION")
     lines <- .readLinesWithEOLs(descpath)
     lines <- .update_dcf_field(lines, "Version", .small_version_bump)
     if (update.Date) {

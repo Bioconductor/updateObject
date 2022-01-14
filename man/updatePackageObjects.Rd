@@ -24,8 +24,8 @@ updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL, filter=NULL,
 
 \arguments{
   \item{pkgpath}{
-    The path (as a single string) to the top-level directory of a package
-    source tree.
+    The path (as a single string) to the top-level directory
+    of an R package source tree.
   }
   \item{filter,dry.run}{
     These arguments are passed down to \code{updateSerializedObjects()}.
