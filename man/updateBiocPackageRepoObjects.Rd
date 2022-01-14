@@ -92,8 +92,14 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
 ## updateBiocPackageRepoObjects()
 ## ---------------------------------------------------------------------
 
+## On a package with a mix of RDS and RDA files:
 repopath <- file.path(tempdir(), "CellBench")
-updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_14",
+updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13",
+                             remove.clone.on.success=TRUE)
+
+## On a package with no serialized objects:
+repopath <- file.path(tempdir(), "BiocGenerics")
+updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13",
                              remove.clone.on.success=TRUE)
 
 ## ---------------------------------------------------------------------
@@ -127,16 +133,12 @@ LOAD_FAILURE <- c(
 
 UPDATEOBJECT_FAILURE <- c(
     "ACE",
-    "AffiXcan",
-    "animalcules",
     "AnnotationHubData",
     "arrayMvout",
     "Autotuner",
     "BASiCS",
     "bigmelon",
     "Biobase",
-    "BiocOncoTK",
-    "BiSeq",
     "CAMERA",
     "categoryCompare",
     "cellHTS2",
@@ -144,7 +146,6 @@ UPDATEOBJECT_FAILURE <- c(
     "CEMiTool",
     "CeTF",
     "cleanUpdTSeq",
-    "clustifyr",
     "CoGAPS",
     "CoreGx",
     "CrispRVariants",
@@ -153,22 +154,16 @@ UPDATEOBJECT_FAILURE <- c(
     "DIAlignR",
     "enhancerHomologSearch",
     "fcoex",
-    "GeneRegionScan",
     "geNetClassifier",
-    "GOpro",
     "GreyListChIP",
     "GSgalgoR",
-    "hipathia",
     "hmdbQuery",
     "iCOBRA",
-    "LOBSTAHS",
     "MassArray",
     "midasHLA",
     "MinimumDistance",
-    "missRows",
     "MSnbase",
     "msPurity",
-    "msqrob2",
     "multiHiCcompare",
     "musicatk",
     "MutationalPatterns",
@@ -180,16 +175,12 @@ UPDATEOBJECT_FAILURE <- c(
     "puma",
     "qcmetrics",
     "QDNAseq",
-    "QFeatures",
     "r3Cseq",
     "RadioGx",
     "RTN",
     "sangeranalyseR",
-    "scp",
-    "StarBioTrek",
     "synapter",
     "tigre",
-    "TimiRGeN",
     "topGO",
     "ToxicoGx",
     "VariantFiltering",

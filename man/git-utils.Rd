@@ -73,12 +73,10 @@ commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
 }
 
 \examples{
-repopath <- file.path(tempdir(), "limma")
-
+repopath <- file.path(tempdir(), "IdeoViz")
 prepare_git_repo_for_work(repopath)
 bump_pkg_version(repopath, update.Date=TRUE)
 commit_changes(repopath, commit_msg="version bump", push=FALSE)
-
 unlink(repopath, recursive=TRUE)
 }
 \keyword{utilities}
