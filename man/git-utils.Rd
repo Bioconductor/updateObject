@@ -24,6 +24,11 @@ commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
     The path (as a single string) to the local Git repository of a
     Bioconductor package.
 
+    If the specified path exists, \code{prepare_git_repo_for_work()} will
+    check that it's a workable Git repo (i.e. contains no uncommitted changes).
+    If that's the case then it will call \code{git pull} on it, otherwise
+    it will return an error.
+
     If the specified path does not exist, \code{prepare_git_repo_for_work()}
     will try to infer the package name from \code{repopath} and clone it
     from \url{git.bioconductor.org}.
@@ -51,9 +56,10 @@ commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
 
 \value{
   \code{prepare_git_repo_for_work()} returns \code{FALSE} if the supplied
-  path was pointing to a local Git repository that already existed, and
-  \code{TRUE} if it didn't and a fresh local Git repository had to be
-  created with \code{git clone}.
+  path already exists, and \code{TRUE} if it didn't exist and needed
+  to be cloned.
+
+  \code{commit_changes()} returns an invisible \code{NULL}.
 }
 
 \seealso{

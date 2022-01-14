@@ -11,14 +11,14 @@ updatePackageObjects <- function(pkgpath=".", filter=NULL,
     if (!isTRUEorFALSE(bump.Version))
         stop(wmsg("'bump.Version' must be TRUE or FALSE"))
 
-    ans <- updateSerializedObjects(pkgpath, filter=filter, dry.run=dry.run)
-    if (bump.Version) {
+    code <- updateSerializedObjects(pkgpath, filter=filter, dry.run=dry.run)
+    if (bump.Version && code > 0L) {
         ## bump_pkg_version() calls get_descpath() again so if the above
         ## call to get_descpath() emitted a warning then bump_pkg_version()
         ## will emit that same warning again.
         suppressWarnings(bump_pkg_version(pkgpath, update.Date=TRUE))
     }
-    ans
+    code
 }
 
 ### Return a named integer vector **parallel** to 'all_pkgpaths'.

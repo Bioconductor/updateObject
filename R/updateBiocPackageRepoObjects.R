@@ -7,6 +7,7 @@
 updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
                                          filter=NULL,
                                          commit_msg=NULL, push=FALSE,
+                                         remove.clone.on.success=FALSE,
                                          git=NULL)
 {
     if (is.null(commit_msg)) {
@@ -14,9 +15,11 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
     } else if (!isSingleString(commit_msg) || commit_msg == "") {
         stop(wmsg("'commit_msg' must be a single (non-empty) string"))
     }
+    if (!isTRUEorFALSE(remove.clone.on.success))
+        stop(wmsg("'remove.clone.on.success' must be TRUE or FALSE"))
 
     ## 1. Prepare the Git repo for work (clone or pull).
-    prepare_git_repo_for_work(repopath, branch, git)
+    is_new_clone <- prepare_git_repo_for_work(repopath, branch, git)
 
     ## 2. Update package objects.
     call <- c("updatePackageObjects(\"", repopath, "\"")
@@ -26,25 +29,35 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
     message("RUNNING '", call, "'...")
     code <- updatePackageObjects(repopath, filter=filter, bump.Version=TRUE)
     message()
-    if (code < 0)
+    if (code < 0L)
         stop("updatePackageObjects() encountered an error")
 
-    if (code == 0) {
+    if (code == 0L) {
         message("NOTHING TO UPDATE.")
-        return(invisible(code))
+    } else {
+        ## 3. Commit and push.
+        commit_changes(repopath, commit_msg, push, git)
+
+        ## 4. Celebrate!
+        message()
+        msg <- c("UPDATE OBJECTS",
+                 " >> UPDATE DESCRIPTION FILE",
+                 " >> COMMIT")
+        if (push)
+            msg <- c(msg, " >> PUSH")
+        msg <- c(msg, " SUCCESSFUL.")
+        message(msg)
     }
 
-    ## 3. Bump package version, set current Date, commit, and push.
-    commit_changes(repopath, commit_msg, push, git)
+    ## 5. Cleanup.
+    if (remove.clone.on.success) {
+        if (is_new_clone) {
+            unlink(repopath, recursive=TRUE)
+        } else {
+            warning("'repopath' was an existing Git repo, didn't remove it")
+        }
+    }
 
-    ## Celebrate!
-    msg <- c("UPDATE OBJECTS",
-             " >> UPDATE DESCRIPTION FILE",
-             " >> COMMIT")
-    if (push)
-        msg <- c(msg, " >> PUSH")
-    msg <- c(msg, " SUCCESSFUL.")
-    message(msg)
     invisible(code)
 }
 

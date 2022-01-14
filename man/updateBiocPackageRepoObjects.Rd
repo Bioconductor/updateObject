@@ -17,7 +17,8 @@
 
 \usage{
 updateBiocPackageRepoObjects(repopath=".", branch=NULL, filter=NULL,
-        commit_msg=NULL, push=FALSE, git=NULL)
+        commit_msg=NULL, push=FALSE, remove.clone.on.success=FALSE,
+        git=NULL)
 
 updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
 }
@@ -43,6 +44,10 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
     Whether to push the changes or not. Changes are committed but not
     pushed by default. You need push access to the package Git repository
     at \url{git.bioconductor.org} in order to use \code{push=TRUE}.
+  }
+  \item{remove.clone.on.success}{
+    Whether to remove the Git clone on success or not. Only applies
+    if \code{repopath} does not exist and needs to be cloned.
   }
   \item{all_repopaths}{
     Character vector of paths to local Git repositories of Bioconductor
@@ -83,6 +88,18 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
 }
 
 \examples{
+## ---------------------------------------------------------------------
+## updateBiocPackageRepoObjects()
+## ---------------------------------------------------------------------
+
+repopath <- file.path(tempdir(), "CellBench")
+updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_14",
+                             remove.clone.on.success=TRUE)
+
+## ---------------------------------------------------------------------
+## updateAllBiocPackageRepoObjects()
+## ---------------------------------------------------------------------
+
 ## Let's assume that the current directory is populated with the
 ## Git repositories of all Bioconductor software packages:
 ALL_REPOS <- dir()  # get list of package repos to update
@@ -192,9 +209,8 @@ PUSH_FAILURE <- c(
 )
 
 OTHER_SKIPPED_REPOS <- c(
-    "BaalChIP", "BiGGR", "CytoTree", "GeneAnswers",
-    "gwascat", "isobar", "mirIntegrator", "oposSOM", "PFP", "ROntoTools",
-    "SLGI", "SNPhood"
+    "BaalChIP", "BiGGR", "CytoTree", "gwascat", "isobar",
+    "mirIntegrator", "oposSOM", "PFP", "ROntoTools", "SLGI", "SNPhood"
 )
 
 SKIPPED_REPOS <- c(

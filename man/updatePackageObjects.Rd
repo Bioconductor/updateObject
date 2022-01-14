@@ -32,11 +32,14 @@ updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL, filter=NULL,
     See \code{?\link{updateSerializedObjects}} for the details.
   }
   \item{bump.Version}{
-    \code{TRUE} or \code{FALSE}. If \code{TRUE} then the package version is
-    bumped, that is, the Version field in its DESCRIPTION file gets bumped
-    from X.Y.Z to X.Y.(Z+1). For example, 2.0.9 becomes 2.0.10.
+    \code{TRUE} or \code{FALSE}. If \code{TRUE} and if some RDS or RDA files
+    in the package actually get updated by \code{updateSerializedObjects()},
+    then the package version will get bumped, that is, the Version field in
+    its DESCRIPTION file will get bumped from X.Y.Z to X.Y.(Z+1).
+    For example, version 2.0.9 will become 2.0.10.
 
-    Additionally, the Date field (if present) gets updated to the current date.
+    Additionally, the Date field (if present) will get updated to the
+    current date.
   }
   \item{all_pkgpaths}{
     Character vector of package paths.
