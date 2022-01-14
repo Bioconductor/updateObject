@@ -9,7 +9,7 @@ Version: 0.2.3
 License: Artistic-2.0
 Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"), email="hpages.on.github@gmail.com")
-Depends: R (>= 4.1.0), methods, BiocGenerics, S4Vectors
+Depends: R (>= 4.2.0), methods, BiocGenerics, S4Vectors
 Imports: utils, digest
 Suggests: SummarizedExperiment, GenomicAlignments, DelayedArray, HDF5Array,
 	SingleCellExperiment, MultiAssayExperiment, bsseq, InteractionSet,
