@@ -49,6 +49,13 @@ commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
   }
 }
 
+\value{
+  \code{prepare_git_repo_for_work()} returns \code{FALSE} if the supplied
+  path was pointing to a local Git repository that already existed, and
+  \code{TRUE} if it didn't and a fresh local Git repository had to be
+  created with \code{git clone}.
+}
+
 \seealso{
   \itemize{
     \item \code{\link{updateBiocPackageRepoObjects}} which uses

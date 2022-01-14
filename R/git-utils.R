@@ -5,16 +5,6 @@
 
 .GIT_SERVER <- 'git.bioconductor.org'
 
-.infer_pkgname_from_path <- function(repopath)
-{
-    pkgname <- basename(repopath)
-    nc <- nchar(pkgname)
-    last_char <- substr(pkgname, nc, nc)
-    if (last_char %in% c("", ".", " "))
-        stop(wmsg("cannot infer package name from supplied repo path"))
-    pkgname
-}
-
 .find_git <- function(git=NULL)
 {
     if (is.null(git)) {
@@ -47,13 +37,30 @@
     git
 }
 
-.run_git_command <- function(git, repopath=".", ...)
+### A wrapper around system2() that turns the error returned by the supplied
+### command into an R error, except when 'capture.stderr=TRUE' in which case
+### the stderr produced by the command is captured and returned.
+.system3 <- function(command, args=character(0), capture.stderr=FALSE)
+{
+    if (capture.stderr)
+        return(suppressWarnings(system2(command, args, stderr=TRUE)))
+    status <- suppressWarnings(system2(command, args))
+    if (status != 0L) {
+        cat("\n")
+        stop("\n  Command:\n\n    ",
+             command, " ", paste(args, collapse=" "),
+             "\n\n  returned error code ", status, ".")
+    }
+}
+
+.run_git_command <- function(git, repopath=".", args=character(0),
+                             capture.stderr=FALSE)
 {
     stopifnot(isSingleString(repopath))
     oldwd <- getwd()
     setwd(repopath)
     on.exit(setwd(oldwd))
-    suppressWarnings(system2(git, ...))
+    .system3(git, args, capture.stderr=capture.stderr)
 }
 
 .is_git_repo <- function(git, repopath=".")
@@ -61,8 +68,9 @@
     if (!dir.exists(repopath))
         return(FALSE)
     args <- c("status", "--porcelain")
-    stderr <- .run_git_command(git, repopath, args, stderr=TRUE)
-    is.null(attributes(stderr)[["status"]])
+    stderr <- .run_git_command(git, repopath, args, capture.stderr=TRUE)
+    status <- attr(stderr, "status")
+    is.null(status)
 }
 
 ### A more cautious version of .is_git_repo() that also makes sure that
@@ -72,18 +80,29 @@
     if (!dir.exists(repopath))
         stop(wmsg("the supplied path is not a directory"))
     args <- c("status", "--porcelain")
-    stderr <- .run_git_command(git, repopath, args, stderr=TRUE)
-    if (!is.null(attributes(stderr)[["status"]]))
-        stop(wmsg("not a Git repo: ", repopath))
+    stderr <- .run_git_command(git, repopath, args, capture.stderr=TRUE)
+    status <- attr(stderr, "status")
+    if (!is.null(status))
+        stop(wmsg("Not a Git repo: ", repopath))
     if (length(stderr) != 0L && substr(stderr[[1L]], 1L, 1L) != "?")
-        stop(wmsg("the repo has uncommitted changes"))
+        stop(wmsg("Git repo has uncommitted changes"))
 }
 
 .git_pull <- function(git, repopath=".", branch=NULL)
 {
     if (!is.null(branch))
-        .run_git_command(git, repopath, paste("checkout", branch))
+        .run_git_command(git, repopath, c("checkout", branch))
     .run_git_command(git, repopath, "pull")
+}
+
+.infer_pkgname_from_path <- function(repopath)
+{
+    pkgname <- basename(repopath)
+    nc <- nchar(pkgname)
+    last_char <- substr(pkgname, nc, nc)
+    if (last_char %in% c("", ".", " "))
+        stop(wmsg("cannot infer package name from supplied repo path"))
+    pkgname
 }
 
 .git_clone_bioc_package <- function(git, pkgname, branch=NULL, repopath=NULL)
@@ -94,7 +113,7 @@
     args <- c(args, sprintf("git@%s:packages/%s.git", .GIT_SERVER, pkgname))
     if (!is.null(repopath))
         args <- c(args, repopath)
-    system2(git, args)
+    .system3(git, args)
 }
 
 ### Prepare the Git repo for work by:
@@ -115,11 +134,12 @@ prepare_git_repo_for_work <- function(repopath=".", branch=NULL, git=NULL)
         ## Pull.
         .check_git_repo_is_workable(git, repopath)
         .git_pull(git, repopath, branch)
-    } else {
-        ## Clone.
-        pkgname <- .infer_pkgname_from_path(repopath)
-        .git_clone_bioc_package(git, pkgname, branch, repopath)
+        return(FALSE)
     }
+    ## Clone.
+    pkgname <- .infer_pkgname_from_path(repopath)
+    .git_clone_bioc_package(git, pkgname, branch, repopath)
+    return(TRUE)
 }
 
 .git_commit_all_changes <- function(git, repopath=".", commit_msg)
@@ -127,7 +147,7 @@ prepare_git_repo_for_work <- function(repopath=".", branch=NULL, git=NULL)
     ## If 'repopath' is not a Git repo, 'git --no-pager diff' will spit
     ## out many screens of ugly output!
     if(!.is_git_repo(git, repopath))
-        stop(wmsg("not a Git repo: ", repopath))
+        stop(wmsg("Not a Git repo: ", repopath))
     .run_git_command(git, repopath, c("--no-pager", "diff"))
     commit_msg <- gsub("\"", "\\\\\"", commit_msg)
     args <- c("commit", "-a", sprintf("-m \"%s\"", commit_msg))
