@@ -149,6 +149,7 @@ prepare_git_repo_for_work <- function(repopath=".", branch=NULL, git=NULL)
     if(!.is_git_repo(git, repopath))
         stop(wmsg("Not a Git repo: ", repopath))
     .run_git_command(git, repopath, c("--no-pager", "diff"))
+    cat("\n")
     commit_msg <- gsub("\"", "\\\\\"", commit_msg)
     args <- c("commit", "-a", sprintf("-m \"%s\"", commit_msg))
     .run_git_command(git, repopath, args)
@@ -170,7 +171,9 @@ commit_changes <- function(repopath=".", commit_msg, push=FALSE, git=NULL)
     git <- .find_git(git)
 
     .git_commit_all_changes(git, repopath, commit_msg)
-    if (push)
+    if (push) {
+        cat("\n")
         .git_push(git, repopath)
+    }
 }
 

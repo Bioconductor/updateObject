@@ -22,6 +22,7 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
     is_new_clone <- prepare_git_repo_for_work(repopath, branch, git)
 
     ## 2. Update package objects.
+    message()
     call <- c("updatePackageObjects(\"", repopath, "\"")
     if (!is.null(filter))
         call <- c(call, ", filter=\"", filter, "\"")
