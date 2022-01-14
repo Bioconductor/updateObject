@@ -3,7 +3,7 @@
 \alias{updateBiocPackageRepoObjects}
 \alias{updateAllBiocPackageRepoObjects}
 
-\title{Update all the serialized objects contained in a
+\title{Update the serialized objects contained in a
        Bioconductor package Git repository or in a set of
        Bioconductor package Git repositories}
 
@@ -12,7 +12,7 @@
   \code{updateAllBiocPackageRepoObjects()} are wrappers to
   \code{\link{updatePackageObjects}()} and
   \code{\link{updateAllPackageObjects}()} that take care of
-  committing and pushing the changes made to the packages.
+  committing and pushing the changes made to the package(s).
 }
 
 \usage{
@@ -60,7 +60,7 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
     \code{updateAllBiocPackageRepoObjects()} walks over the
     \code{all_repopaths} vector and calls
     \code{updateBiocPackageRepoObjects()} on each repository path.
-    All the arguments passed thru \code{...} are passed down to
+    All the arguments in \code{...} are passed down to
     \code{updateBiocPackageRepoObjects()}.
   }
   \item{git}{
