@@ -27,7 +27,7 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
     if (!is.null(filter))
         call <- c(call, ", filter=\"", filter, "\"")
     call <- c(call, ", bump.Version=TRUE)")
-    message("RUNNING '", call, "'...")
+    message("RUNNING '", gsub("\\\\", "\\\\\\\\", call), "'...")
     code <- updatePackageObjects(repopath, filter=filter, bump.Version=TRUE)
     message()
     if (code < 0L)

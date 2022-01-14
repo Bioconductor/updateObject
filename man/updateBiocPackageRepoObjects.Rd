@@ -202,8 +202,8 @@ PUSH_FAILURE <- c(
 )
 
 OTHER_SKIPPED_REPOS <- c(
-    "BaalChIP", "BiGGR", "CytoTree", "gwascat", "isobar",
-    "mirIntegrator", "oposSOM", "PFP", "ROntoTools", "SLGI", "SNPhood"
+    "BaalChIP", "BiGGR", "CytoTree", "gwascat", "mirIntegrator",
+    "oposSOM", "PFP", "ROntoTools", "SLGI", "SNPhood"
 )
 
 SKIPPED_REPOS <- c(
