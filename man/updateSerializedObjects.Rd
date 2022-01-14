@@ -10,10 +10,14 @@
 
 \description{
   Use \code{updateSerializedObjects()} to find and update all the
-  serialized objects contained in a directory.
+  serialized objects contained in a directory. This is the workhorse
+  behind higher-level functions \code{\link{updatePackageObjects}()}
+  and family (\code{\link{updateAllPackageObjects}()},
+  \code{\link{updateBiocPackageRepoObjects}()}, and
+  \code{\link{updateAllBiocPackageRepoObjects}()}).
 
   \code{collect_rds_files()}, \code{collect_rda_files()},
-  \code{update_rds_file()}, and \code{update_rda_file()}, are the
+  \code{update_rds_file()}, and \code{update_rda_file()} are the
   low-level utilities used internally by \code{updateSerializedObjects()}
   to do the job.
 }
