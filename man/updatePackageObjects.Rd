@@ -75,31 +75,35 @@ updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL, filter=NULL,
 }
 
 \examples{
-\dontrun{
 ## ---------------------------------------------------------------------
 ## A SIMPLE updatePackageObjects() EXAMPLE
 ## ---------------------------------------------------------------------
 
-## Note that we don't need to perform two passes ("dry run" + "real run"),
-## one pass is enough. Here we show the 2-pass procedure only for
-## illustrative purpose.
+pkgurl <- "https://git.bioconductor.org/packages/IdeoViz"
+pkgpath <- file.path(tempdir(), "IdeoViz")
+system2("git", c("clone", "--branch RELEASE_3_13", pkgurl, pkgpath))
 
-pkg_url <- "https://git.bioconductor.org/packages/CellBench"
-system2("git", c("clone", pkg_url))
-setwd("CellBench")
-code <- updatePackageObjects(dry.run=TRUE)
+## Note that we don't need to perform two passes ("dry run" + "real run"),
+## one pass is enough. Here we show the 2-pass procedure for illustrative
+## purpose only.
+code <- updatePackageObjects(pkgpath, dry.run=TRUE)
+code  # a non-negative code means everything went fine
+
 if (code > 0) {
-    updatePackageObjects()  # do it for good!
-    ## Use an editor to bump the version in the DESCRIPTION file.
-    commit_msg <- "'Pass serialized S4 instances thru updateObject()'"
-    system2("git", c("commit", "-a", "-m", commit_msg))
-    setwd("..")
+    ## Do it for good!
+    updatePackageObjects(pkgpath, bump.Version=TRUE)
+
+    ## Take a look at the changes.
+    system2("git", c("-C", pkgpath, "status"))
+    system2("git", c("-C", pkgpath, "--no-pager", "diff"))
 }
+
+unlink(pkgpath, recursive=TRUE)
 
 ## ---------------------------------------------------------------------
 ## FIND CANDIDATE PACKAGES IN CURRENT DIRECTORY
 ## ---------------------------------------------------------------------
-
+\dontrun{
 ## In this example we perform a "dry run" with updateAllPackageObjects()
 ## to find all the packages in a directory that contain old serialized
 ## objects.
