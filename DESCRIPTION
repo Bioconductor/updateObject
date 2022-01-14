@@ -8,8 +8,7 @@ BugReports: https://github.com/Bioconductor/updateObject/issues
 Version: 0.2.3
 License: Artistic-2.0
 Encoding: UTF-8
-Author: Hervé Pagès <hpages.on.github@gmail.com>
-Maintainer: Hervé Pagès <hpages.on.github@gmail.com>
+Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"), email="hpages.on.github@gmail.com")
 Depends: R (>= 4.1.0), methods, BiocGenerics, S4Vectors
 Imports: utils, digest
 Suggests: SummarizedExperiment, GenomicAlignments, DelayedArray, HDF5Array,
