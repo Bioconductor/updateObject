@@ -129,9 +129,12 @@ dirpath <- system.file("extdata", package="updateObject")
 updateSerializedObjects(dirpath, dry.run=TRUE)
 
 ## Note that updateSerializedObjects() needs to attach/load the packages
-## in which the classes of the objects to update are defined. So
-## sessionInfo() will typically report more attached and loaded packages
-## after a updateSerializedObjects() run than before:
+## in which the classes of the objects to update are defined. These
+## packages are: GenomicRanges for GRanges objects, SummarizedExperiment
+## for SummarizedExperiment objects, and InteractionSet for GInteractions
+## objects. This means that sessionInfo() will typically report more
+## attached and loaded packages after a updateSerializedObjects() run
+## than before:
 sessionInfo()
 
 ## Also updateSerializedObjects() will raise an error if it fails to

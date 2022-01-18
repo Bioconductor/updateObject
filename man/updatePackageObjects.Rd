@@ -79,6 +79,12 @@ updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL, filter=NULL,
 ## A SIMPLE updatePackageObjects() EXAMPLE
 ## ---------------------------------------------------------------------
 
+## IdeoViz is a Bioconductor package that contains serialized
+## GRanges objects. Note that, in order to update these objects,
+## updatePackageObjects() will need to attach the GenomicRanges
+## package. That's because this is where the GRanges class and
+## updateObject() method for GRanges objects are both defined.
+## See '?updateSerializedObjects' for more information.
 pkgurl <- "https://git.bioconductor.org/packages/IdeoViz"
 pkgpath <- file.path(tempdir(), "IdeoViz")
 system2("git", c("clone", "--branch RELEASE_3_13", pkgurl, pkgpath))
@@ -98,6 +104,10 @@ if (code > 0) {
     system2("git", c("-C", pkgpath, "--no-pager", "diff"))
 }
 
+## An additional run would only confirm that there's nothing left
+## to update.
+updatePackageObjects(pkgpath)
+
 unlink(pkgpath, recursive=TRUE)
 
 ## ---------------------------------------------------------------------
@@ -107,19 +117,6 @@ unlink(pkgpath, recursive=TRUE)
 ## In this example we perform a "dry run" with updateAllPackageObjects()
 ## to find all the packages in a directory that contain old serialized
 ## objects.
-
-## Load some packages upfront that are known to define updateObject()
-## methods:
-library(SummarizedExperiment)
-library(GenomicAlignments)
-library(DelayedArray)
-library(HDF5Array)
-library(SingleCellExperiment)
-library(MultiAssayExperiment)
-library(bsseq)
-library(InteractionSet)
-library(GSEABase)
-library(Gviz)
 
 ## Let's assume that the current directory is populated with package
 ## git clones:
@@ -131,17 +128,18 @@ all_pkgs <- dir()  # get list of packages
 ##   all_pkgs <- setdiff(all_pkgs, SKIPPED_PKGS)
 ##
 ## for this. However, by using the 'skipped_pkgs' argument, all the
-## packages will be represented in the returned vector, including the
-## skipped packages:
-SKIPPED_PKGS <- c("BaalChIP", "CytoTree", "gwascat", "isobar", "SNPhood")
+## packages in the original 'all_pkgs' will be represented in the
+## returned vector, including the skipped packages:
+SKIPPED_PKGS <- c(
+    "BaalChIP", "BiGGR", "CytoTree", "gwascat",
+    "mirIntegrator", "oposSOM", "PFP", "ROntoTools", "SLGI"
+)
 
 ## --- Without a filter ---
 
 ## updateAllPackageObjects() will stop with an error if a package is
 ## required but not installed. The user is responsible for installing
-## all the required packages (this can be hard to know in advance).
-## Having pre-loaded a bunch of packages above only increases our chance
-## of a smooth run.
+## all the required packages (this is admittedly hard to know in advance).
 codes <- updateAllPackageObjects(all_pkgs, skipped_pkgs=SKIPPED_PKGS,
                                  dry.run=TRUE)
 
