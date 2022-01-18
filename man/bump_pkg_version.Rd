@@ -23,6 +23,10 @@ bump_pkg_version(pkgpath=".", update.Date=FALSE)
   }
 }
 
+\value{
+  An invisible \code{NULL}.
+}
+
 \seealso{
   \itemize{
     \item \code{\link{updatePackageObjects}} which uses
