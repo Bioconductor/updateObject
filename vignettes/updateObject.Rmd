@@ -11,13 +11,166 @@ output:
   BiocStyle::html_document
 ---
 
+
 # Introduction
 
 `r Biocpkg("updateObject")` is an R package that provides a set of
 tools built around the `updateObject()` generic function to make it
 easy to work with old serialized S4 instances.
+
 The package is primarily useful to package maintainers who want to
 update the serialized S4 instances included in their package.
+
+
+# Out-of-sync objects
+
+Out-of-sync objects (a.k.a. _outdated_ or _old_ objects) are R objects
+that got serialized at some point and became out-of-sync later on when
+the authors/maintainers of an S4 class made some changes to the internals
+of the class.
+
+A typical example of this situation is when some slots of an S4 class `A`
+get added, removed, or renamed. When this happens, any object of class `A`
+(a.k.a. `A` _instance_) that got serialized before this change (i.e. written
+to disk with `saveRDS()`, `save()`, or `serialize()`) becomes out-of-sync
+with the new class definition.
+
+Note that this is also the case of any `A` _derivative_ (i.e. any object
+that belongs to a class that extends `A`), as well as any object that
+_contains_ an `A` instance or derivative. For example, if `B` extends `A`,
+then any serialized list of `A` or `B` objects is now an _old_ object,
+and any S4 object of class `C` that has `A` or `B` objects in some of its
+slots now is also an _old_ object.
+
+An important thing to keep in mind is that, in fact, the exact parts of a
+serialized object `x` that are out-of-sync with their class definition can
+be deeply nested inside `x`.
+
+
+# The updateObject() generic function
+
+`updateObject()` is the core function used in Bioconductor for updating
+old R objects. The function is an S4 generic currently defined in the
+`r Biocpkg("BiocGenerics")` package and with dozens of methods defined
+across many Bioconductor packages. For example, the `r Biocpkg("S4Vectors")`
+package defines `updateObject()` methods for Vector, SimpleList, DataFrame,
+and Hits objects, the `r Biocpkg("SummarizedExperiment")` package defines
+methods for SummarizedExperiment, RangedSummarizedExperiment, and Assays
+objects, the  `r Biocpkg("MultiAssayExperiment")` package defines a method
+for MultiAssayExperiment objects, the  `r Biocpkg("QFeatures")` package a
+method for QFeatures objects, etc...
+
+See `?BiocGenerics::updateObject` in the `r Biocpkg("BiocGenerics")`
+package for more information.
+
+
+# A tedious process
+
+Serialized objects are typically (but not exclusively) found in R packages.
+To update all the serialized objects contained in a given package, one
+usually needs to perform the following steps:
+
+- Identify all the files in the package that contain serialized R objects.
+  Serialized R objects are normally written to RDS or RDA files. These
+  files typically use file extensions `.rds` (for RDS files), and `.rda`
+  or `.RData` (for RDA files).
+
+- Load each serialized object into R. This is usually done by calling
+  `readRDS()` on each RDS file, and `load()` on each RDA file. Note that
+  unlike RDS files which can only contain a single object per file, RDA
+  files can contain an arbitrary number of objects per file.
+
+- Pass each object thru `updateObject()`:
+
+    ```
+    x <- updateObject(x)
+    ```
+
+  Note that if `x` doesn't contain any out-of-sync parts then `updateObject()`
+  will act as a no-op, that is, it will return an object that is strictly
+  identical to the original object.
+
+- Write each object back to its original file. This is done with `saveRDS()`
+  or `save()`, depending on whether the object came from an RDS or RDA file.
+  Note that this only needs to be done for objects that _actually_ contained
+  out-of-sync parts i.e. for objects on which `updateObject()` did _not_ act
+  as a no-op.
+
+In addition to the above steps, the package maintainer also needs to perform
+the usual steps required for updating a package and publishing its new version.
+In the case of a Bioconductor package, these steps are:
+
+- Bump the package version.
+
+- Set its `Date` field (if present) to the current date.
+
+- Commit the changes.
+
+- Push the changes to `git.bioconductor.org`.
+
+Performing all the above steps manually can be tedious and error prone,
+especially if the package contains many serialized objects, or if the
+entire procedure needs to be performed on a big collection of packages.
+The `r Biocpkg("updateObject")` package provides a set of tools that
+intend to make this much easier.
+
+
+# updateBiocPackageRepoObjects()
+
+`updateBiocPackageRepoObjects()` is the central function in the
+`r Biocpkg("updateObject")` package. It takes care of updating the
+serialized objects contained in a given Bioconductor package by
+performing all the steps described in the previous section.
+
+Here we use it on the `RELEASE_3_13` branch of the `r Biocpkg("TimiRGeN")`
+package:
+```{r}
+library(updateObject)
+
+repopath <- file.path(tempdir(), "TimiRGeN")
+updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13")
+```
+
+Important notes:
+
+- By default `updateBiocPackageRepoObjects()` does not try to push the
+  changes (you'd need to set `push=TRUE` for that).
+
+- The `RELEASE_3_13` branch of all Bioconductor packages got frozen in
+  October 2021. The above example is for illustrative purpose only.
+  A more realistic situation would be to use `updateBiocPackageRepoObjects()`
+  on the development version (i.e. the `master` branch) of the package,
+  and to push the changes by calling the function with `push=TRUE`.
+  
+See `?updateBiocPackageRepoObjects` for more information and more
+examples.
+
+
+# List of tools provided by the updateObject package
+
+The package provides the following tools:
+
+- `updateBiocPackageRepoObjects()`: See above.
+
+- `updatePackageObjects()`: A simpler version of
+  `updateBiocPackageRepoObjects()` that doesn't know anything about
+  Git. That is, `updatePackageObjects()` will do the same thing
+  as `updateBiocPackageRepoObjects()` except that it won't commit
+  or push the changes. This means that the function can be used on
+  any local package source tree, whether it's a Git clone or not,
+  and whether it's a Bioconductor package or not.
+
+- `updateAllBiocPackageRepoObjects()` and `updateAllPackageObjects()`:
+  Similar to `updateBiocPackageRepoObjects()` and `updatePackageObjects()`
+  but for processing _a set_ of Bioconductor package Git repositories (for
+  `updateAllBiocPackageRepoObjects()`) and _a set_ of packages (for
+  `updateAllPackageObjects()`).
+
+- `updateSerializedObjects()`: The workhorse behind the above functions.
+
+See individual man pages in the package for more information e.g.
+`?updatePackageObjects`.
+
 
 # Session information
 
