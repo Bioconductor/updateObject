@@ -11,6 +11,7 @@ Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"), email="hpages.on.github@gmail.com")
 Depends: R (>= 4.2.0), methods, BiocGenerics, S4Vectors
 Imports: utils, digest
-Suggests: GenomicRanges, SummarizedExperiment, InteractionSet
+Suggests: GenomicRanges, SummarizedExperiment, InteractionSet, knitr
 SystemRequirements: git
+VignetteBuilder: knitr
 Collate: updateSerializedObjects.R bump_pkg_version.R find_python.R git-utils.R updatePackageObjects.R updateBiocPackageRepoObjects.R

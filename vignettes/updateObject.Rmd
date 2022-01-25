@@ -1,0 +1,27 @@
+---
+title: "A quick introduction to the _updateObject_ package"
+author: "Hervé Pagès"
+date: "Compiled `r doc_date()`;  Modified 24 January 2022"
+package: "`r pkg_ver('updateObject')`"
+vignette: >
+  %\VignetteIndexEntry{A quick introduction to the updateObject package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::html_document
+---
+
+# Introduction
+
+`r Biocpkg("updateObject")` is an R package that provides a set of
+tools built around the `updateObject()` generic function to make it
+easy to work with old serialized S4 instances.
+The package is primarily useful to package maintainers who want to
+update the serialized S4 instances included in their package.
+
+# Session information
+
+```{r}
+sessionInfo()
+```
+
