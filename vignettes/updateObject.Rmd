@@ -1,7 +1,7 @@
 ---
 title: "A quick introduction to the _updateObject_ package"
 author: "Hervé Pagès"
-date: "Compiled `r doc_date()`;  Modified 24 January 2022"
+date: "Compiled `r doc_date()`;  Modified 26 January 2022"
 package: "`r pkg_ver('updateObject')`"
 vignette: >
   %\VignetteIndexEntry{A quick introduction to the updateObject package}
@@ -122,18 +122,20 @@ intend to make this much easier.
 serialized objects contained in a given Bioconductor package by
 performing all the steps described in the previous section.
 
-Here we use it on the `RELEASE_3_13` branch of the `r Biocpkg("TimiRGeN")`
-package:
-```{r}
+Let's load `r Biocpkg("updateObject")`:
+```{r, message=FALSE}
 library(updateObject)
-
+```
+and try `updateBiocPackageRepoObjects()` on the `RELEASE_3_13` branch
+of the `r Biocpkg("TimiRGeN")` package:
+```{r}
 repopath <- file.path(tempdir(), "TimiRGeN")
 updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13")
 ```
 
 Important notes:
 
-- By default `updateBiocPackageRepoObjects()` does not try to push the
+- By default `updateBiocPackageRepoObjects()` does _not_ try to push the
   changes (you'd need to set `push=TRUE` for that).
 
 - The `RELEASE_3_13` branch of all Bioconductor packages got frozen in

@@ -37,14 +37,30 @@
     git
 }
 
-### A wrapper around system2() that turns the error returned by the supplied
-### command into an R error, except when 'capture.stderr=TRUE' in which case
-### the stderr produced by the command is captured and returned.
+### A wrapper around system2():
+### - that does its best to make the command output visible in the code
+###   chunks of an Rmd vignette;
+### - that turns the error returned by the supplied command into an
+###   R error, except when 'capture.stderr=TRUE' in which case
+###   the stderr produced by the command is captured and returned.
 .system3 <- function(command, args=character(0), capture.stderr=FALSE)
 {
     if (capture.stderr)
         return(suppressWarnings(system2(command, args, stderr=TRUE)))
-    status <- suppressWarnings(system2(command, args))
+    if (interactive()) {
+        status <- suppressWarnings(system2(command, args))
+    } else {
+        ## In the context of an Rmd vignette code chunk, it seems that knitr
+        ## is unable to capture the output of the command. A workaround is
+        ## to capture this output and have R display it. Et voila !
+        output <- suppressWarnings(system2(command, args,
+                                           stdout=TRUE, stderr=TRUE))
+        if (length(output) != 0L)
+            cat(output, sep="\n")
+        status <- attr(output, "status")
+        if (is.null(status))
+            status <- 0L
+    }
     if (status != 0L) {
         cat("\n")
         stop("\n  Command:\n\n    ",
