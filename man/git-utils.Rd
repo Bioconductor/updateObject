@@ -14,7 +14,7 @@
 }
 
 \usage{
-prepare_git_repo_for_work(repopath=".", branch=NULL, git=NULL)
+prepare_git_repo_for_work(repopath=".", branch=NULL, git=NULL, use.https=FALSE)
 
 commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
 }
@@ -40,6 +40,19 @@ commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
     already exists) or the default branch is used (if \code{repopath}
     does not exist and needs to be cloned).
   }
+  \item{git}{
+    The path (as a single string) to the git command if it's not in the
+    PATH.
+  }
+  \item{use.https}{
+    By default, \code{git clone git@git.bioconductor.org:packages/MyPackage}
+    is used to clone a package repo from the Bioconductor Git server. Note
+    that this works only for authorized maintainers of package \pkg{MyPackage}.
+    By setting \code{use.https} to \code{TRUE}, the package will be cloned
+    instead from \code{https://git.bioconductor.org:packages/MyPackage}, which
+    should work for anybody, but then pushing back the changes to the package
+    won't be possible.
+  }
   \item{commit_msg}{
     The Git commit message.
   }
@@ -47,10 +60,6 @@ commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
     Whether to push the changes or not. Changes are committed but not
     pushed by default. You need push access to the package Git repository
     at \url{git.bioconductor.org} in order to use \code{push=TRUE}.
-  }
-  \item{git}{
-    The path (as a single string) to the git command if it's not in the
-    PATH.
   }
 }
 

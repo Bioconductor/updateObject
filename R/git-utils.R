@@ -121,12 +121,18 @@
     pkgname
 }
 
-.git_clone_bioc_package <- function(git, pkgname, branch=NULL, repopath=NULL)
+.git_clone_bioc_package <- function(git, pkgname, branch=NULL, repopath=NULL,
+                                    use.https=FALSE)
 {
     args <- "clone"
     if (!is.null(branch))
         args <- c(args, paste("--branch", branch))
-    args <- c(args, sprintf("git@%s:packages/%s.git", .GIT_SERVER, pkgname))
+    if (use.https) {
+        base_url <- sprintf("https://%s/", .GIT_SERVER)
+    } else {
+        base_url <- sprintf("git@%s:", .GIT_SERVER)
+    }
+    args <- c(args, sprintf("%spackages/%s", base_url, pkgname))
     if (!is.null(repopath))
         args <- c(args, repopath)
     .system3(git, args)
@@ -138,12 +144,15 @@
 ###   already exists. But first we check for uncommitted changes and
 ###   raise an error if there are. We don't want to touch a local repo that
 ###   has uncommitted changes!
-prepare_git_repo_for_work <- function(repopath=".", branch=NULL, git=NULL)
+prepare_git_repo_for_work <- function(repopath=".", branch=NULL,
+                                      git=NULL, use.https=FALSE)
 {
     if (!isSingleString(repopath))
         stop(wmsg("'repopath' must be a single string"))
     if (!is.null(branch) && !isSingleString(branch))
         stop(wmsg("'branch' must be NULL or a single string"))
+    if (!isTRUEorFALSE(use.https))
+        stop(wmsg("'use.https' must be TRUE or FALSE"))
     git <- .find_git(git)
 
     if (file.exists(repopath)) {
@@ -154,7 +163,7 @@ prepare_git_repo_for_work <- function(repopath=".", branch=NULL, git=NULL)
     }
     ## Clone.
     pkgname <- .infer_pkgname_from_path(repopath)
-    .git_clone_bioc_package(git, pkgname, branch, repopath)
+    .git_clone_bioc_package(git, pkgname, branch, repopath, use.https)
     return(TRUE)
 }
 

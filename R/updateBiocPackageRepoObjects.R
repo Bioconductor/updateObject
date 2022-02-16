@@ -8,7 +8,7 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
                                          filter=NULL,
                                          commit_msg=NULL, push=FALSE,
                                          remove.clone.on.success=FALSE,
-                                         git=NULL)
+                                         git=NULL, use.https=FALSE)
 {
     if (is.null(commit_msg)) {
         commit_msg <- "Pass serialized S4 instances thru updateObject()"
@@ -19,7 +19,7 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
         stop(wmsg("'remove.clone.on.success' must be TRUE or FALSE"))
 
     ## 1. Prepare the Git repo for work (clone or pull).
-    is_new_clone <- prepare_git_repo_for_work(repopath, branch, git)
+    is_new_clone <- prepare_git_repo_for_work(repopath, branch, git, use.https)
 
     ## 2. Update package objects.
     message()

@@ -1,11 +1,13 @@
 Package: updateObject
 Title: Find/fix old serialized S4 instances
 Description: A set of tools built around updateObject() to work with old
-	serialized S4 instances.
+	serialized S4 instances. The package is primarily useful to package
+	maintainers who want to update the serialized S4 instances included
+	in their package.
 biocViews: Infrastructure, DataRepresentation
 URL: https://bioconductor.org/packages/updateObject
 BugReports: https://github.com/Bioconductor/updateObject/issues
-Version: 0.99.2
+Version: 0.99.3
 License: Artistic-2.0
 Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"), email="hpages.on.github@gmail.com")

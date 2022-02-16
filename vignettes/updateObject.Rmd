@@ -1,7 +1,7 @@
 ---
 title: "A quick introduction to the _updateObject_ package"
 author: "Hervé Pagès"
-date: "Compiled `r doc_date()`;  Modified 26 January 2022"
+date: "Compiled `r doc_date()`;  Modified 16 February 2022"
 package: "`r pkg_ver('updateObject')`"
 vignette: >
   %\VignetteIndexEntry{A quick introduction to the updateObject package}
@@ -130,19 +130,28 @@ and try `updateBiocPackageRepoObjects()` on the `RELEASE_3_13` branch
 of the `r Biocpkg("TimiRGeN")` package:
 ```{r}
 repopath <- file.path(tempdir(), "TimiRGeN")
-updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13")
+updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13", use.https=TRUE)
 ```
 
 Important notes:
 
 - By default `updateBiocPackageRepoObjects()` does _not_ try to push the
-  changes (you'd need to set `push=TRUE` for that).
+  changes to `git.bioconductor.org`. Only the authorized maintainers of
+  the `r Biocpkg("TimiRGeN")` package can do that. If you are using
+  `updateBiocPackageRepoObjects()` on a package that you maintain and
+  you wish to push the changes to `git.bioconductor.org`, then do NOT use
+  HTTPS access (i.e. don't use `use.https=TRUE`) and use `push=TRUE`.
 
 - The `RELEASE_3_13` branch of all Bioconductor packages got frozen in
   October 2021. The above example is for illustrative purpose only.
   A more realistic situation would be to use `updateBiocPackageRepoObjects()`
-  on the development version (i.e. the `master` branch) of the package,
-  and to push the changes by calling the function with `push=TRUE`.
+  on the development version (i.e. the `master` branch) of a package
+  that you maintain, and to push the changes by calling the function
+  with `push=TRUE`:
+
+    ```
+    updateBiocPackageRepoObjects(repopath, push=TRUE)
+    ```
   
 See `?updateBiocPackageRepoObjects` for more information and more
 examples.

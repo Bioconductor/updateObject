@@ -18,7 +18,7 @@
 \usage{
 updateBiocPackageRepoObjects(repopath=".", branch=NULL, filter=NULL,
         commit_msg=NULL, push=FALSE, remove.clone.on.success=FALSE,
-        git=NULL)
+        git=NULL, use.https=FALSE)
 
 updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
 }
@@ -49,6 +49,9 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
     Whether to remove the Git clone on success or not. Only applies
     if \code{repopath} does not exist and needs to be cloned.
   }
+  \item{git, use.https}{
+    See \code{?\link{prepare_git_repo_for_work}}.
+  }
   \item{all_repopaths}{
     Character vector of paths to local Git repositories of Bioconductor
     packages.
@@ -62,9 +65,6 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
     \code{updateBiocPackageRepoObjects()} on each repository path.
     All the arguments in \code{...} are passed down to
     \code{updateBiocPackageRepoObjects()}.
-  }
-  \item{git}{
-    See \code{?\link{prepare_git_repo_for_work}}.
   }
 }
 
