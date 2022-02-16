@@ -86,8 +86,8 @@ repopath <- file.path(tempdir(), "IdeoViz")
 ## We must use HTTPS access to clone the package because we are
 ## not maintainers of the IdeoViz package. A more realistic situation
 ## would be to use prepare_git_repo_for_work() on a package that we
-## maintain, in which case 'use.https=FALSE' would not be needed:
-prepare_git_repo_for_work(repopath, use.https=FALSE)
+## maintain, in which case 'use.https=TRUE' would not be needed:
+prepare_git_repo_for_work(repopath, use.https=TRUE)
 
 bump_pkg_version(repopath, update.Date=TRUE)
 commit_changes(repopath, commit_msg="version bump", push=FALSE)
