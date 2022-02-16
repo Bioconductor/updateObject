@@ -92,15 +92,39 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
 ## updateBiocPackageRepoObjects()
 ## ---------------------------------------------------------------------
 
+## Typical use, assuming MyPackage is a Bioconductor package that you
+## maintain:
+\dontrun{
+  repopath <- file.path(tempdir(), "MyPackage")
+  updateBiocPackageRepoObjects(repopath, push=TRUE)
+}
+
+## Note that by default `updateBiocPackageRepoObjects()` does NOT try
+## to push the changes to git.bioconductor.org. Only the authorized
+## maintainers of MyPackage can do that. In the examples below we
+## must use HTTPS access to clone the package because we are not
+## maintainers of the CellBench or BiocGenerics packages. Also we
+## don't use 'push=TRUE' because we are not allowed to do that (it
+## wouldn't work anyways).
+
 ## On a package with a mix of RDS and RDA files:
 repopath <- file.path(tempdir(), "CellBench")
 updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13",
-                             remove.clone.on.success=TRUE)
+                             remove.clone.on.success=TRUE,
+                             use.https=TRUE)
 
 ## On a package with no serialized objects:
 repopath <- file.path(tempdir(), "BiocGenerics")
 updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13",
-                             remove.clone.on.success=TRUE)
+                             remove.clone.on.success=TRUE,
+                             use.https=TRUE)
+
+## Note that the RELEASE_3_13 branch of all Bioconductor packages got
+## frozen in October 2021. The above examples are for illustrative
+## purpose only. A more realistic situation would be to use
+## updateBiocPackageRepoObjects() on the development version (i.e.
+## the master branch) of a package that you maintain, and to push the
+## changes by calling the function with 'push=TRUE'.
 
 ## ---------------------------------------------------------------------
 ## updateAllBiocPackageRepoObjects()
