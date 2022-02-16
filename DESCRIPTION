@@ -7,7 +7,7 @@ Description: A set of tools built around updateObject() to work with old
 biocViews: Infrastructure, DataRepresentation
 URL: https://bioconductor.org/packages/updateObject
 BugReports: https://github.com/Bioconductor/updateObject/issues
-Version: 0.99.4
+Version: 0.99.5
 License: Artistic-2.0
 Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"), email="hpages.on.github@gmail.com")
