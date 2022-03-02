@@ -3,7 +3,7 @@ Title: Find/fix old serialized S4 instances
 Description: A set of tools built around updateObject() to work with old
 	serialized S4 instances. The package is primarily useful to package
 	maintainers who want to update the serialized S4 instances included
-	in their package.
+	in their package. This is still work-in-progress.
 biocViews: Infrastructure, DataRepresentation
 URL: https://bioconductor.org/packages/updateObject
 BugReports: https://github.com/Bioconductor/updateObject/issues
@@ -13,7 +13,8 @@ Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"), email="hpages.on.github@gmail.com")
 Depends: R (>= 4.2.0), methods, BiocGenerics, S4Vectors
 Imports: utils, digest
-Suggests: GenomicRanges, SummarizedExperiment, InteractionSet, knitr
+Suggests: GenomicRanges, SummarizedExperiment, InteractionSet, testthat,
+	knitr, rmarkdown, BiocStyle
 SystemRequirements: git
 VignetteBuilder: knitr
 Collate: updateSerializedObjects.R bump_pkg_version.R find_python.R git-utils.R updatePackageObjects.R updateBiocPackageRepoObjects.R
