@@ -3,7 +3,7 @@
 ### -------------------------------------------------------------------------
 
 
-collect_files <- function(dirpath, fileexts)
+.collect_files <- function(dirpath, fileexts, recursive=FALSE)
 {
     if (!(is.character(dirpath) &&
           length(dirpath) == 1L &&
@@ -13,14 +13,14 @@ collect_files <- function(dirpath, fileexts)
     }
     pattern <- paste0("\\.(", paste(fileexts, collapse="|"), ")$")
     dir(dirpath, pattern=pattern, ignore.case=TRUE,
-        recursive=TRUE, full.names=TRUE)
+        recursive=recursive, full.names=TRUE)
 }
 
-collect_rds_files <- function(dirpath=".")
-    collect_files(dirpath, "rds")
+collect_rds_files <- function(dirpath=".", recursive=FALSE)
+    .collect_files(dirpath, "rds", recursive=recursive)
 
-collect_rda_files <- function(dirpath=".")
-    collect_files(dirpath, c("rda", "RData"))
+collect_rda_files <- function(dirpath=".", recursive=FALSE)
+    .collect_files(dirpath, c("rda", "RData"), recursive=recursive)
 
 ### If 'x' is an S4 object, doing 'inherits(x, "try-error")' will trigger
 ### the loading of 'attr(class(x), "package")' and we don't want that.
@@ -194,11 +194,14 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
 }
 
 ### The workhorse behind updatePackageObjects().
-updateSerializedObjects <- function(dirpath=".", filter=NULL, dry.run=FALSE)
+updateSerializedObjects <- function(dirpath=".", recursive=FALSE,
+                                    filter=NULL, dry.run=FALSE)
 {
     if (!isSingleString(dirpath))
         stop(wmsg("'dirpath' must be a single string containig ",
                   "the path to a directory"))
+    if (!isTRUEorFALSE(recursive))
+        stop(wmsg("'recursive' must be TRUE or FALSE"))
     if (!(is.null(filter) || isSingleString(filter)))
         stop(wmsg("'filter' must be NULL or a single string containing ",
                   "a regular expression"))
@@ -206,12 +209,12 @@ updateSerializedObjects <- function(dirpath=".", filter=NULL, dry.run=FALSE)
         stop(wmsg("'dry.run' must be TRUE or FALSE"))
 
     codes <- integer(0)
-    rds_paths <- collect_rds_files(dirpath)
+    rds_paths <- collect_rds_files(dirpath, recursive=recursive)
     for (filepath in rds_paths) {
         code <- update_rds_file(filepath, filter=filter, dry.run=dry.run)
         codes <- c(codes, code)
     }
-    rda_paths <- collect_rda_files(dirpath)
+    rda_paths <- collect_rda_files(dirpath, recursive=recursive)
     for (filepath in rda_paths) {
         code <- update_rda_file(filepath, filter=filter, dry.run=dry.run)
         codes <- c(codes, code)

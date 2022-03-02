@@ -23,11 +23,12 @@
 }
 
 \usage{
-updateSerializedObjects(dirpath=".", filter=NULL, dry.run=FALSE)
+updateSerializedObjects(dirpath=".", recursive=FALSE,
+                        filter=NULL, dry.run=FALSE)
 
 ## Low-level utilities upon which updateSerializedObjects() is built:
-collect_rds_files(dirpath=".")
-collect_rda_files(dirpath=".")
+collect_rds_files(dirpath=".", recursive=FALSE)
+collect_rda_files(dirpath=".", recursive=FALSE)
 update_rds_file(filepath, filter=NULL, dry.run=FALSE)
 update_rda_file(filepath, filter=NULL, dry.run=FALSE)
 }
@@ -35,6 +36,11 @@ update_rda_file(filepath, filter=NULL, dry.run=FALSE)
 \arguments{
   \item{dirpath}{
     The path (as a single string) to an arbitrary directory.
+  }
+  \item{recursive}{
+    \code{TRUE} or \code{FALSE}. Should the directory be searched recursively
+    to find the objects to update? By default the directory is \emph{not}
+    searched recursively.
   }
   \item{filter}{
     \code{NULL} (the default) or a single string containing a regular
@@ -121,12 +127,14 @@ update_rda_file(filepath, filter=NULL, dry.run=FALSE)
 }
 
 \examples{
-## --- Without a filter ---
-
 dirpath <- system.file("extdata", package="updateObject")
 
+## ---------------------------------------------------------------------
+## WITHOUT A FILTER
+## ---------------------------------------------------------------------
+
 ## updateSerializedObjects() prints one line per processed file:
-updateSerializedObjects(dirpath, dry.run=TRUE)
+updateSerializedObjects(dirpath, recursive=TRUE, dry.run=TRUE)
 
 ## Note that updateSerializedObjects() needs to attach/load the packages
 ## in which the classes of the objects to update are defined. These
@@ -141,7 +149,9 @@ sessionInfo()
 ## attach or load a package (typically because the package is missing).
 ## It will NOT try to install the package.
 
-## --- With a filter ---
+## ---------------------------------------------------------------------
+## WITH A FILTER
+## ---------------------------------------------------------------------
 
 ## We want to filter on the presence of the **word** "DataFrame" in
 ## the output of 'updateObject( , check=FALSE, verbose=TRUE)'. We can't
@@ -149,6 +159,7 @@ sessionInfo()
 ## matches in the presence of strings like "AnnotatedDataFrame":
 filter <- "\\bDataFrame\\b"
 
-updateSerializedObjects(dirpath, filter=filter, dry.run=TRUE)
+updateSerializedObjects(dirpath, recursive=TRUE, filter=filter,
+                        dry.run=TRUE)
 }
 \keyword{utilities}
