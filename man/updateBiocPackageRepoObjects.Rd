@@ -106,7 +106,10 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
 ## maintainers of the CellBench or BiocGenerics packages. Also we
 ## don't use 'push=TRUE' because we are not allowed to do that (it
 ## wouldn't work anyways).
-
+\dontshow{
+  ## Set some fake committer identity:
+  Sys.setenv(GIT_COMMITTER_NAME="titi", GIT_COMMITTER_EMAIL="titi@gmail.com")
+}
 ## On a package with a mix of RDS and RDA files:
 repopath <- file.path(tempdir(), "CellBench")
 updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13",

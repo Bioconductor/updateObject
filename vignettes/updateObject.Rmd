@@ -12,6 +12,11 @@ output:
 ---
 
 
+```{r, echo=FALSE, results="hide"}
+## Set some fake committer identity:
+Sys.setenv(GIT_COMMITTER_NAME="titi", GIT_COMMITTER_EMAIL="titi@gmail.com")
+```
+
 # Introduction
 
 `r Biocpkg("updateObject")` is an R package that provides a set of

@@ -14,7 +14,8 @@
 }
 
 \usage{
-prepare_git_repo_for_work(repopath=".", branch=NULL, git=NULL, use.https=FALSE)
+prepare_git_repo_for_work(repopath=".", branch=NULL, git=NULL,
+                          use.https=FALSE)
 
 commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
 }
@@ -83,6 +84,7 @@ commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
 
 \examples{
 repopath <- file.path(tempdir(), "IdeoViz")
+
 ## We must use HTTPS access to clone the package because we are
 ## not maintainers of the IdeoViz package. A more realistic situation
 ## would be to use prepare_git_repo_for_work() on a package that we
@@ -90,6 +92,10 @@ repopath <- file.path(tempdir(), "IdeoViz")
 prepare_git_repo_for_work(repopath, use.https=TRUE)
 
 bump_pkg_version(repopath, update.Date=TRUE)
+\dontshow{
+  ## Set some fake committer identity:
+  Sys.setenv(GIT_COMMITTER_NAME="titi", GIT_COMMITTER_EMAIL="titi@gmail.com")
+}
 commit_changes(repopath, commit_msg="version bump", push=FALSE)
 
 unlink(repopath, recursive=TRUE)
