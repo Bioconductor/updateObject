@@ -29,8 +29,8 @@ collect_rda_files <- function(dirpath=".", recursive=FALSE)
 ### Known invalid packages found in 'attr(class(x), "package")' as of
 ### Nov 17, 2021.
 .KNOWN_INVALID_CLASSDEF_PKGS <- c(
-  ## For some serialized S4 instances hub 'attr(class(x), "package")' is
-  ## set to ".GlobalEnv"! This is the case for example for CellMapperList
+  ## For some serialized S4 instances in the hubs 'attr(class(x), "package")'
+  ## is set to ".GlobalEnv"! This is the case for example for CellMapperList
   ## instances EH170 to EH175 in ExperimentHub. Not sure how that's allowed
   ## but let's just deal with it.
     ".GlobalEnv",
@@ -86,11 +86,15 @@ collect_rda_files <- function(dirpath=".", recursive=FALSE)
             ans <- suppressWarnings(updateObject(x, check=FALSE))
         )
     } else {
-        output <- capture.output(
-            ans <- suppressWarnings(updateObject(x, check=FALSE, verbose=TRUE)),
-            type="message"
+        ## Use capture_message() instead of capture.output(..., type="message").
+        ## Unlike the latter, nested calls to the former work properly. This
+        ## will allow us to capture the messages stream of a call to a
+        ## higher-level function like updateSerializedObjects() or
+        ## updatePackageObjects().
+        msg <- capture_message(
+            ans <- suppressWarnings(updateObject(x, check=FALSE, verbose=TRUE))
         )
-        match_filter <- any(grepl(filter, output))
+        match_filter <- any(grepl(filter, msg))
         if (match_filter) {
             message("MATCH, ", appendLF=FALSE)
         } else {

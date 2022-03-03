@@ -17,4 +17,4 @@ Suggests: GenomicRanges, SummarizedExperiment, InteractionSet, testthat,
 	knitr, rmarkdown, BiocStyle
 SystemRequirements: git
 VignetteBuilder: knitr
-Collate: updateSerializedObjects.R bump_pkg_version.R find_python.R git-utils.R updatePackageObjects.R updateBiocPackageRepoObjects.R
+Collate: capture_message.R updateSerializedObjects.R bump_pkg_version.R find_python.R git-utils.R updatePackageObjects.R updateBiocPackageRepoObjects.R
