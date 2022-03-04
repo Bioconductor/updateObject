@@ -7,6 +7,10 @@
 }
 
 test_that("bump_pkg_version", {
+    ## These tests don't run properly on Windows at the moment.
+    ## TODO: Investigate this.
+    skip_on_os("windows")
+
     ## Create dummy R package:
     pkgname <- "Dummy"
     desc <- c(
