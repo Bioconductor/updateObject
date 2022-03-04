@@ -1,0 +1,9 @@
+Package: DemoPackage
+Title: Not a real package
+Description: A small demo package with some old serialized GRanges objects in it.
+Version: 0.1.0
+Date: 2017-12-08
+License: Artistic-2.0
+Author: Hercule Poirot
+Maintainer: Hercule Poirot <hercule.poirot@google.com>
+Depends: Biobase, IRanges, GenomicRanges

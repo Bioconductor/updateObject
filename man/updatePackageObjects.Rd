@@ -79,34 +79,35 @@ updateAllPackageObjects(all_pkgpaths, skipped_pkgs=NULL, filter=NULL,
 ## A SIMPLE updatePackageObjects() EXAMPLE
 ## ---------------------------------------------------------------------
 
-## IdeoViz is a Bioconductor package that contains serialized
-## GRanges objects. Note that, in order to update these objects,
-## updatePackageObjects() will need to attach the GenomicRanges
-## package. That's because this is where the GRanges class and
-## updateObject() method for GRanges objects are both defined.
-## See '?updateSerializedObjects' for more information.
-pkgurl <- "https://git.bioconductor.org/packages/IdeoViz"
-pkgpath <- file.path(tempdir(), "IdeoViz")
-system2("git", c("clone", "--branch RELEASE_3_13", pkgurl, pkgpath))
+## DemoPackage is a small demo package (contained in the updateObject
+## package) with some old serialized GRanges objects in it.
+pkgname <- "DemoPackage"
+pkgpath0 <- system.file(pkgname, package="updateObject")
 
-## Note that we don't need to perform two passes ("dry run" + "real run"),
-## one pass is enough. Here we show the 2-pass procedure for illustrative
-## purpose only.
+## Let's copy DemoPackage to a writable location.
+pkgpath <- file.path(tempdir(), pkgname)
+file.copy(pkgpath0, dirname(pkgpath), recursive=TRUE)
+
+## Note that, in order to update the GRanges objects contained in
+## DemoPackage, updatePackageObjects() will need to attach the
+## GenomicRanges package. That's because this is where the GRanges
+## class and updateObject() method for GRanges objects are both
+## defined. See '?updateSerializedObjects' for more information.
+## Also note that we don't need to perform two passes ("dry run" +
+## "real run"), one pass is enough. Here we show the 2-pass procedure
+## for illustrative purpose only.
+
+## 1st pass: dry run
 code <- updatePackageObjects(pkgpath, dry.run=TRUE)
 code  # a non-negative code means everything went fine
 
-if (code > 0) {
-    ## Do it for good!
-    updatePackageObjects(pkgpath, bump.Version=TRUE)
-
-    ## Take a look at the changes.
-    system2("git", c("-C", pkgpath, "status"))
-    system2("git", c("-C", pkgpath, "--no-pager", "diff"))
-}
+## 2nd pass: do it for good!
+updatePackageObjects(pkgpath, bump.Version=TRUE)
 
 ## An additional run would only confirm that there's nothing left
 ## to update.
-updatePackageObjects(pkgpath)
+code <- updatePackageObjects(pkgpath)
+code  # 0 (no files to update)
 
 unlink(pkgpath, recursive=TRUE)
 
