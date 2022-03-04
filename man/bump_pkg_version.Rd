@@ -32,7 +32,7 @@ bump_pkg_version(pkgpath=".", update.Date=FALSE)
     \item \code{\link{updatePackageObjects}} which uses
           \code{bump_pkg_version} internally when \code{bump.Version=TRUE}.
 
-    \item \code{\link{commit_changes}} for an example.
+    \item \code{\link{git_commit}} for an example.
   }
 }
 

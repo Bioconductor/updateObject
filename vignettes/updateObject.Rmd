@@ -12,11 +12,6 @@ output:
 ---
 
 
-```{r, echo=FALSE, results="hide"}
-## Set some fake committer identity:
-Sys.setenv(GIT_COMMITTER_NAME="titi", GIT_COMMITTER_EMAIL="titi@gmail.com")
-```
-
 # Introduction
 
 `r Biocpkg("updateObject")` is an R package that provides a set of
@@ -130,6 +125,11 @@ performing all the steps described in the previous section.
 Let's load `r Biocpkg("updateObject")`:
 ```{r, message=FALSE}
 library(updateObject)
+```
+```{r, echo=FALSE, results="hide"}
+## Set fake git user to make git_commit() happy:
+set_git_user_name("titi")
+set_git_user_email("titi@gmail.com")
 ```
 and try `updateBiocPackageRepoObjects()` on the `RELEASE_3_13` branch
 of the `r Biocpkg("TimiRGeN")` package:

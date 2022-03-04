@@ -18,7 +18,9 @@ export(
 
     ## git-utils.R:
     prepare_git_repo_for_work,
-    commit_changes,
+    set_git_user_name, unset_git_user_name,
+    set_git_user_email, unset_git_user_email,
+    git_commit,
 
     ## updatePackageObjects.R:
     updatePackageObjects,

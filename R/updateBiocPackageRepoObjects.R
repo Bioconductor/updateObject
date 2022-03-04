@@ -8,7 +8,8 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
                                          filter=NULL,
                                          commit_msg=NULL, push=FALSE,
                                          remove.clone.on.success=FALSE,
-                                         git=NULL, use.https=FALSE)
+                                         git=NULL, use.https=FALSE,
+                                         user_name=NULL, user_email=NULL)
 {
     if (is.null(commit_msg)) {
         commit_msg <- "Pass serialized S4 instances thru updateObject()"
@@ -37,7 +38,7 @@ updateBiocPackageRepoObjects <- function(repopath=".", branch=NULL,
         message("NOTHING TO UPDATE.")
     } else {
         ## 3. Commit and push.
-        commit_changes(repopath, commit_msg, push, git)
+        git_commit(repopath, commit_msg, push, git, user_name, user_email)
 
         ## 4. Celebrate!
         message()

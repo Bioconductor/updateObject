@@ -2,13 +2,17 @@
 
 \alias{git-utils}
 \alias{prepare_git_repo_for_work}
-\alias{commit_changes}
+\alias{set_git_user_name}
+\alias{unset_git_user_name}
+\alias{set_git_user_email}
+\alias{unset_git_user_email}
+\alias{git_commit}
 
 \title{Convenience Git-related utility functions used by
        updateBiocPackageRepoObjects()}
 
 \description{
-  \code{prepare_git_repo_for_work()} and \code{commit_changes()}
+  \code{prepare_git_repo_for_work()} and \code{git_commit()}
   are used internally by \code{\link{updateBiocPackageRepoObjects}()}
   to perform Git operations.
 }
@@ -17,7 +21,8 @@
 prepare_git_repo_for_work(repopath=".", branch=NULL, git=NULL,
                           use.https=FALSE)
 
-commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
+git_commit(repopath=".", commit_msg, push=FALSE,
+           git=NULL, user_name=NULL, user_email=NULL)
 }
 
 \arguments{
@@ -62,6 +67,14 @@ commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
     pushed by default. You need push access to the package Git repository
     at \url{git.bioconductor.org} in order to use \code{push=TRUE}.
   }
+  \item{user_name, user_email}{
+    Set the Git user name and/or email to use for the commit. This overrides
+    the Git user name and/or email that the git command would otherwise use.
+    See the COMMIT INFORMATION section in
+    \code{system2("git", c("commit", "--help"))}
+    for the details about where the git command normally takes
+    this information from.
+  }
 }
 
 \value{
@@ -69,13 +82,13 @@ commit_changes(repopath=".", commit_msg, push=FALSE, git=NULL)
   path already exists, and \code{TRUE} if it didn't exist and needed
   to be cloned.
 
-  \code{commit_changes()} returns an invisible \code{NULL}.
+  \code{git_commit()} returns an invisible \code{NULL}.
 }
 
 \seealso{
   \itemize{
     \item \code{\link{updateBiocPackageRepoObjects}} which uses
-          \code{prepare_git_repo_for_work} and \code{commit_changes}
+          \code{prepare_git_repo_for_work} and \code{git_commit}
           internally.
 
     \item \code{\link{bump_pkg_version}}.
@@ -93,11 +106,15 @@ prepare_git_repo_for_work(repopath, use.https=TRUE)
 
 bump_pkg_version(repopath, update.Date=TRUE)
 \dontshow{
-  ## Set some fake committer identity:
-  Sys.setenv(GIT_COMMITTER_NAME="titi", GIT_COMMITTER_EMAIL="titi@gmail.com")
+  ## Set fake git user to make git_commit() happy:
+  old_names <- set_git_user_name("titi")
+  old_emails <- set_git_user_email("titi@gmail.com")
 }
-commit_changes(repopath, commit_msg="version bump", push=FALSE)
-
+git_commit(repopath, commit_msg="version bump", push=FALSE)
+\dontshow{
+  unset_git_user_name(old_names)
+  unset_git_user_email(old_emails)
+}
 unlink(repopath, recursive=TRUE)
 }
 \keyword{utilities}

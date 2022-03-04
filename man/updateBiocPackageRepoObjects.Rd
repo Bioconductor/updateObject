@@ -18,7 +18,7 @@
 \usage{
 updateBiocPackageRepoObjects(repopath=".", branch=NULL, filter=NULL,
         commit_msg=NULL, push=FALSE, remove.clone.on.success=FALSE,
-        git=NULL, use.https=FALSE)
+        git=NULL, use.https=FALSE, user_name=NULL, user_email=NULL)
 
 updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
 }
@@ -52,6 +52,9 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
   \item{git, use.https}{
     See \code{?\link{prepare_git_repo_for_work}}.
   }
+  \item{user_name, user_email}{
+    See \code{?\link{git_commit}}.
+  }
   \item{all_repopaths}{
     Character vector of paths to local Git repositories of Bioconductor
     packages.
@@ -82,7 +85,7 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
           \code{\link{updateAllPackageObjects}}.
 
     \item Utility functions \code{\link{prepare_git_repo_for_work}}
-          and \code{\link{commit_changes}} which are used internally by
+          and \code{\link{git_commit}} which are used internally by
           \code{updateBiocPackageRepoObjects} to perform the Git operations.
   }
 }
@@ -107,8 +110,9 @@ updateAllBiocPackageRepoObjects(all_repopaths=".", skipped_repos=NULL, ...)
 ## don't use 'push=TRUE' because we are not allowed to do that (it
 ## wouldn't work anyways).
 \dontshow{
-  ## Set some fake committer identity:
-  Sys.setenv(GIT_COMMITTER_NAME="titi", GIT_COMMITTER_EMAIL="titi@gmail.com")
+  ## Set fake git user to make git_commit() happy:
+  old_names <- set_git_user_name("titi")
+  old_emails <- set_git_user_email("titi@gmail.com")
 }
 ## On a package with a mix of RDS and RDA files:
 repopath <- file.path(tempdir(), "CellBench")
@@ -121,7 +125,10 @@ repopath <- file.path(tempdir(), "BiocGenerics")
 updateBiocPackageRepoObjects(repopath, branch="RELEASE_3_13",
                              remove.clone.on.success=TRUE,
                              use.https=TRUE)
-
+\dontshow{
+  unset_git_user_name(old_names)
+  unset_git_user_email(old_emails)
+}
 ## Note that the RELEASE_3_13 branch of all Bioconductor packages got
 ## frozen in October 2021. The above examples are for illustrative
 ## purpose only. A more realistic situation would be to use

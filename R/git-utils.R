@@ -167,6 +167,60 @@ prepare_git_repo_for_work <- function(repopath=".", branch=NULL,
     return(TRUE)
 }
 
+set_git_user_name <- function(user_name)
+{
+    if (!isSingleString(user_name) || user_name == "")
+        stop(wmsg("'user_name' must be a single (non-empty) string"))
+    old_author_name <- Sys.getenv("GIT_AUTHOR_NAME")
+    old_committer_name <- Sys.getenv("GIT_COMMITTER_NAME")
+    Sys.setenv(GIT_AUTHOR_NAME=user_name, GIT_COMMITTER_NAME=user_name)
+    c(old_author_name=old_author_name,
+      old_committer_name=old_committer_name)
+}
+
+unset_git_user_name <- function(old_names)
+{
+    old_author_name <- old_names[["old_author_name"]]
+    old_committer_name <- old_names[["old_committer_name"]]
+    if (old_author_name == "") {
+        Sys.unsetenv("GIT_AUTHOR_NAME")
+    } else {
+        Sys.setenv(GIT_AUTHOR_NAME=old_author_name)
+    }
+    if (old_committer_name == "") {
+        Sys.unsetenv("GIT_COMMITTER_NAME")
+    } else {
+        Sys.setenv(GIT_COMMITTER_NAME=old_committer_name)
+    }
+}
+
+set_git_user_email <- function(user_email)
+{
+    if (!isSingleString(user_email) || user_email == "")
+        stop(wmsg("'user_email' must be a single (non-empty) string"))
+    old_author_email <- Sys.getenv("GIT_AUTHOR_EMAIL")
+    old_committer_email <- Sys.getenv("GIT_COMMITTER_EMAIL")
+    Sys.setenv(GIT_AUTHOR_EMAIL=user_email, GIT_COMMITTER_EMAIL=user_email)
+    c(old_author_email=old_author_email,
+      old_committer_email=old_committer_email)
+}
+
+unset_git_user_email <- function(old_emails)
+{
+    old_author_email <- old_emails[["old_author_email"]]
+    old_committer_email <- old_emails[["old_committer_email"]]
+    if (old_author_email == "") {
+        Sys.unsetenv("GIT_AUTHOR_EMAIL")
+    } else {
+        Sys.setenv(GIT_AUTHOR_EMAIL=old_author_email)
+    }
+    if (old_committer_email == "") {
+        Sys.unsetenv("GIT_COMMITTER_EMAIL")
+    } else {
+        Sys.setenv(GIT_COMMITTER_EMAIL=old_committer_email)
+    }
+}
+
 .git_commit_all_changes <- function(git, repopath=".", commit_msg)
 {
     ## If 'repopath' is not a Git repo, 'git --no-pager diff' will spit
@@ -185,12 +239,21 @@ prepare_git_repo_for_work <- function(repopath=".", branch=NULL,
     .run_git_command(git, repopath, "push")
 }
 
-commit_changes <- function(repopath=".", commit_msg, push=FALSE, git=NULL)
+git_commit <- function(repopath=".", commit_msg, push=FALSE,
+                       git=NULL, user_name=NULL, user_email=NULL)
 {
     if (!isSingleString(repopath))
         stop(wmsg("'repopath' must be a single string"))
     if (!isSingleString(commit_msg) || commit_msg == "")
         stop(wmsg("'commit_msg' must be a single (non-empty) string"))
+    if (!is.null(user_name)) {
+        old_names <- set_git_user_name(user_name)
+        on.exit(unset_git_user_name(old_names))
+    }
+    if (!is.null(user_email)) {
+        old_emails <- set_git_user_email(user_email)
+        on.exit(unset_git_user_email(old_emails), add=TRUE)
+    }
     if (!isTRUEorFALSE(push))
         stop(wmsg("'push' must be TRUE or FALSE"))
     git <- .find_git(git)
