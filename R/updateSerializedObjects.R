@@ -26,57 +26,6 @@ collect_rda_files <- function(dirpath=".", recursive=FALSE)
 ### the loading of 'attr(class(x), "package")' and we don't want that.
 .is_try_error <- function(x) { !isS4(x) && inherits(x, "try-error") }
 
-### Known invalid packages found in 'attr(class(x), "package")' as of
-### Nov 17, 2021.
-.KNOWN_INVALID_CLASSDEF_PKGS <- c(
-  ## For some serialized S4 instances in the hubs 'attr(class(x), "package")'
-  ## is set to ".GlobalEnv"! This is the case for example for CellMapperList
-  ## instances EH170 to EH175 in ExperimentHub. Not sure how that's allowed
-  ## but let's just deal with it.
-    ".GlobalEnv",
-  ## SimResults class (e.g.
-  ## "iCOBRA/inst/extdata/cobradata_example_simres.Rdata") is defined in the
-  ## benchmarkR package which is not part of CRAN or Bioconductor (GitHub-only
-  ## package).
-    "benchmarkR",
-  ## The galgo.Obj class (e.g. "GSgalgoR/inst/extdata/results/final_1.rda")
-  ## used to be defined in galgoR but this package no longer exists (has
-  ## been renamed GSgalgoR).
-    "galgoR",
-  ## The MutationFeatureData class (e.g.
-  ## decompTumor2Sig/inst/extdata/Nik-Zainal_PMID_22608084-pmsignature-G.Rdata)
-  ## is defined in the pmsignature package which is not part of CRAN or
-  ## Bioconductor (GitHub-only package).
-    "pmsignature",
-  ## The QCStats class (e.g. "arrayMvout/inst/simpleaffy/afxsubQC.rda")
-  ## was defined in simpleaffy which got removed in BioC 3.13.
-    "simpleaffy",
-  ## The YAQCStats class (e.g. "qcmetrics/inst/extdata/yqc.rda")
-  ## was defined in yaqcaffy which got removed in BioC 3.14.
-    "yaqcaffy"
-)
-
-### A wrapper around attachNamespace() that tries to attach the package only
-### if it's not already attached.
-.attach_namespace <- function(pkg)
-{
-    if (!(paste0("package:", pkg) %in% search())) {
-        suppressMessages(suppressWarnings(suppressPackageStartupMessages(
-            attachNamespace(pkg)
-        )))
-    }
-}
-
-### Make sure that the package where the class of 'x' is defined is
-### **attached** (loaded is not enough) before calling 'updateObject()' on 'x'.
-.attach_classdef_pkg <- function(x_class)
-{
-    classdef_pkg <- attr(x_class, "package")
-    if (is.null(classdef_pkg) || classdef_pkg %in% .KNOWN_INVALID_CLASSDEF_PKGS)
-        return()
-    .attach_namespace(classdef_pkg)  # do NOT use loadNamespace()
-}
-
 .update_object <- function(x, filter=NULL)
 {
     message("updateObject(", class(x)[[1L]], ", check=FALSE).. ",
@@ -120,7 +69,7 @@ update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
         return(.LOAD_FILE_FAILED)
     }
     message("ok; ", appendLF=FALSE)
-    .attach_classdef_pkg(class(x))
+    BiocGenerics:::attach_classdef_pkg(class(x))
     y <- try(.update_object(x, filter=filter), silent=TRUE)
     if (.is_try_error(y)) {
         message("returned an error ==> ",
@@ -167,7 +116,7 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
         ## the cBioPortalData package.
         ## To prevent surprises further down we force evaluation now.
         suppressMessages(suppressWarnings(force(x)))
-        .attach_classdef_pkg(class(x))
+        BiocGenerics:::attach_classdef_pkg(class(x))
         y <- try(.update_object(x, filter=filter), silent=TRUE)
         if (.is_try_error(y)) {
             message("returned an error ==> ",
