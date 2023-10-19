@@ -69,6 +69,12 @@ update_rds_file <- function(filepath, filter=NULL, dry.run=FALSE)
         return(.LOAD_FILE_FAILED)
     }
     message("ok; ", appendLF=FALSE)
+    ## Do we still need this? Starting with BiocGenerics >= 0.47.1, the
+    ## updateObject() generic takes care of attaching the package where
+    ## class(x) is defined. However note that it only **tries**, and it
+    ## might silently fail. So only reason to keep the call to
+    ## attach_classdef_pkg() here is to get a hard failure if it fails,
+    ## which will happen if e.g. the package to attach is not installed.
     BiocGenerics:::attach_classdef_pkg(class(x))
     y <- try(.update_object(x, filter=filter), silent=TRUE)
     if (.is_try_error(y)) {
@@ -116,6 +122,12 @@ update_rda_file <- function(filepath, filter=NULL, dry.run=FALSE)
         ## the cBioPortalData package.
         ## To prevent surprises further down we force evaluation now.
         suppressMessages(suppressWarnings(force(x)))
+        ## Do we still need this? Starting with BiocGenerics >= 0.47.1, the
+        ## updateObject() generic takes care of attaching the package where
+        ## class(x) is defined. However note that it only **tries**, and it
+        ## might silently fail. So only reason to keep the call to
+        ## attach_classdef_pkg() here is to get a hard failure if it fails,
+        ## which will happen if e.g. the package to attach is not installed.
         BiocGenerics:::attach_classdef_pkg(class(x))
         y <- try(.update_object(x, filter=filter), silent=TRUE)
         if (.is_try_error(y)) {
