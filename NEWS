@@ -1,3 +1,12 @@
+VERSION 1.6.0
+-------------
+
+BUG FIXES
+
+    o Minor tweak to low-level utilities update_rds_file()
+      and update_rda_file().
+
+
 VERSION 1.4.0
 -------------
 
