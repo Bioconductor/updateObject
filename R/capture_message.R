@@ -32,7 +32,7 @@ capture_message <- function(...)
     ## messages stream. See Details section in '?sink'. So in order to
     ## restore the status of the current diversion on exit, we won't be
     ## able to just unstack with 'sink(file=NULL)' like capture.output()
-    ## does. Instead we'll need to explicitely set the diversion back to
+    ## does. Instead we'll need to explicitly set the diversion back to
     ## its old connection.
     old_con <- getConnection(sink.number(type="message"))
 
